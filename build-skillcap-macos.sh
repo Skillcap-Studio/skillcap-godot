@@ -5,10 +5,10 @@ set -e
 GODOT_VERSION=$(python -c "from version import *; print(str(major) + '.' + str(minor) + '.' + str(patch))")
 
 # Compile for Intel (x86-64) powered Macs
-scons platform=macos arch=x86_64
+scons platform=macos arch=x86_64 verbose=yes warnings=extra werror=yes module_text_server_fb_enabled=yes target=editor
 
 # Compile for Apple Silicon (ARM64) powered Macs
-scons platform=macos arch=arm64
+scons platform=macos arch=arm64 verbose=yes warnings=extra werror=yes module_text_server_fb_enabled=yes target=editor
 
 # Bundle both architectures into a single "Universal 2" binary
 lipo -create bin/godot.macos.editor.x86_64 bin/godot.macos.editor.arm64 -output bin/godot.macos.editor.universal
