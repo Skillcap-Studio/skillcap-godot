@@ -120,6 +120,40 @@ have been removed as they caused massive quality regressions. Apply the patches
 in the `patches/` folder when syncing on newer upstream commits.
 
 
+## d3d12ma
+
+- Upstream: https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator
+- Version: 2.1.0-development (4d16e802e0b9451c9d3c27cd308928c13b73acd6, 2023)
+- License: MIT
+
+Files extracted from upstream source:
+
+- `src/D3D12MemAlloc.cpp`, `src/D3D12MemAlloc.natvis`
+- `include/D3D12MemAlloc.h`
+- `LICENSE.txt`, `NOTICES.txt`
+
+Important: Some files have Godot-made changes for use with MinGW.
+They are marked with `/* GODOT start */` and `/* GODOT end */`
+comments.
+
+
+## directx_headers
+
+- Upstream: https://github.com/microsoft/DirectX-Headers
+- Version: 1.611.1 (48f23952bc08a6dce0727339c07cedbc4797356c, 2023)
+- License: MIT
+
+Files extracted from upstream source:
+
+- `include/directx/*.h`
+- `include/dxguids/*.h`
+- `LICENSE`
+
+Important: Some files have Godot-made changes for use with MinGW.
+They are marked with `/* GODOT start */` and `/* GODOT end */`
+comments.
+
+
 ## doctest
 
 - Upstream: https://github.com/onqtam/doctest
@@ -191,6 +225,8 @@ Files extracted from upstream source:
   ```
 - `AUTHORS.txt` and `LICENSE.txt`
 
+Two files (`ProcessRgtc.{cpp,hpp}`) have been added to provide RGTC compression implementation,
+based on library's `ProcessDxtc.{cpp,hpp}`.
 
 ## fonts
 
@@ -501,7 +537,7 @@ File extracted from upstream release tarball:
 ## meshoptimizer
 
 - Upstream: https://github.com/zeux/meshoptimizer
-- Version: git (4a287848fd664ae1c3fc8e5e008560534ceeb526, 2022)
+- Version: git (c21d3be6ddf627f8ca852ba4b6db9903b0557858, 2023)
 - License: MIT
 
 Files extracted from upstream repository:
@@ -509,10 +545,8 @@ Files extracted from upstream repository:
 - All files in `src/`
 - `LICENSE.md`
 
-An [experimental upstream feature](https://github.com/zeux/meshoptimizer/tree/simplify-attr),
-has been backported. On top of that, it was modified to report only distance
-error metrics instead of a combination of distance and attribute errors. Patches
-for both changes can be found in the `patches` directory.
+A patch is included to modify the simplifier to report only distance error
+metrics instead of a combination of distance and attribute errors.
 
 
 ## mingw-std-threads
