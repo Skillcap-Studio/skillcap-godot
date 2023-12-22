@@ -1,4 +1,4 @@
-short_name = "skillcap_godot"
+short_name = "godot"
 name = "Godot Skillcap Engine"
 major = 4
 minor = 3
