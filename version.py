@@ -1,9 +1,9 @@
-short_name = "godot"
+short_name = "skillcap_godot"
 name = "Godot Skillcap Engine"
 major = 4
-minor = 2
-patch = 1
-status = "stable"
+minor = 3
+patch = 0
+status = "dev"
 module_config = ""
 year = 2023
 website = "https://godotengine.org"
