@@ -389,7 +389,7 @@ Files extracted from upstream source:
 ## icu4c
 
 - Upstream: https://github.com/unicode-org/icu
-- Version: 73.2 (680f521746a3bd6a86f25f25ee50a62d88b489cf, 2023)
+- Version: 74.1 (9edac7b78327a1cb58db29e2714b15f9fa14e4d7, 2023)
 - License: Unicode
 
 Files extracted from upstream source:
@@ -401,7 +401,7 @@ Files extracted from upstream source:
 
 Files generated from upstream source:
 
-- The `icudt73l.dat` built with the provided `godot_data.json` config file (see
+- The `icudt74l.dat` built with the provided `godot_data.json` config file (see
   https://github.com/unicode-org/icu/blob/master/docs/userguide/icu_data/buildtool.md
   for instructions).
 
@@ -411,7 +411,7 @@ Files generated from upstream source:
 3. Reconfigure ICU with custom data config:
    `ICU_DATA_FILTER_FILE={GODOT_SOURCE}/thirdparty/icu4c/godot_data.json ./runConfigureICU {PLATFORM} --with-data-packaging=common`
 4. Delete `data/out` folder and rebuild data: `cd data && rm -rf ./out && make`
-5. Copy `source/data/out/icudt73l.dat` to the `{GODOT_SOURCE}/thirdparty/icu4c/icudt73l.dat`
+5. Copy `source/data/out/icudt74l.dat` to the `{GODOT_SOURCE}/thirdparty/icu4c/icudt74l.dat`
 
 
 ## jpeg-compressor
@@ -727,7 +727,7 @@ with the provided patch.
 ## openxr
 
 - Upstream: https://github.com/KhronosGroup/OpenXR-SDK
-- Version: 1.0.31 (95fe35ffb383710a6e0567e958ead9a3b66e930c, 2023)
+- Version: 1.0.33 (dc1e23937fe45eabcce80f6588cf47449edb29d1, 2024)
 - License: Apache 2.0
 
 Files extracted from upstream source:
@@ -861,7 +861,7 @@ instead of `miniz.h` as an external dependency.
 ## thorvg
 
 - Upstream: https://github.com/thorvg/thorvg
-- Version: 0.11.2 (b01fe9bf4461146304d3520d6dc699cf580a3744, 2023)
+- Version: 0.12.0 (25ea242d3867ed66807714f5a52d080984d3c8cc, 2024)
 - License: MIT
 
 Files extracted from upstream source:
