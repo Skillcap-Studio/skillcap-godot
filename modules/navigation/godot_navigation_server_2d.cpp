@@ -242,6 +242,10 @@ void GodotNavigationServer2D::map_force_update(RID p_map) {
 	NavigationServer3D::get_singleton()->map_force_update(p_map);
 }
 
+void GodotNavigationServer2D::map_step(RID p_map, real_t p_delta) {
+	NavigationServer3D::get_singleton()->map_step(p_map, p_delta);
+}
+
 void FORWARD_2(map_set_cell_size, RID, p_map, real_t, p_cell_size, rid_to_rid, real_to_real);
 real_t FORWARD_1_C(map_get_cell_size, RID, p_map, rid_to_rid);
 

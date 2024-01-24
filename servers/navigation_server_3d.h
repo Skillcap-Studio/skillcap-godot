@@ -114,6 +114,7 @@ public:
 
 	virtual void map_force_update(RID p_map) = 0;
 
+	virtual void map_step(RID p_map, real_t p_delta) = 0;
 	/// Creates a new region.
 	virtual RID region_create() = 0;
 

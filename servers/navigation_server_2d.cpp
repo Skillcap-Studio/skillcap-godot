@@ -59,6 +59,7 @@ void NavigationServer2D::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("map_force_update", "map"), &NavigationServer2D::map_force_update);
 
+	ClassDB::bind_method(D_METHOD("map_step", "map", "delta"), &NavigationServer2D::map_step);
 	ClassDB::bind_method(D_METHOD("query_path", "parameters", "result"), &NavigationServer2D::query_path);
 
 	ClassDB::bind_method(D_METHOD("region_create"), &NavigationServer2D::region_create);

@@ -64,6 +64,7 @@ void NavigationServer3D::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("map_force_update", "map"), &NavigationServer3D::map_force_update);
 
+	ClassDB::bind_method(D_METHOD("map_step", "map", "delta"), &NavigationServer3D::map_step);
 	ClassDB::bind_method(D_METHOD("query_path", "parameters", "result"), &NavigationServer3D::query_path);
 
 	ClassDB::bind_method(D_METHOD("region_create"), &NavigationServer3D::region_create);

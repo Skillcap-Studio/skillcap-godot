@@ -58,6 +58,7 @@ public:
 	TypedArray<RID> map_get_agents(RID p_map) const override { return TypedArray<RID>(); }
 	TypedArray<RID> map_get_obstacles(RID p_map) const override { return TypedArray<RID>(); }
 	void map_force_update(RID p_map) override {}
+	void map_step(RID p_map, real_t p_delta) override {}
 
 	RID region_create() override { return RID(); }
 	void region_set_enabled(RID p_region, bool p_enabled) override {}

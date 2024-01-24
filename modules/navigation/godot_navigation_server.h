@@ -140,6 +140,8 @@ public:
 
 	virtual void map_force_update(RID p_map) override;
 
+	virtual void map_step(RID p_map, real_t p_delta) override;
+
 	virtual RID region_create() override;
 
 	COMMAND_2(region_set_enabled, RID, p_region, bool, p_enabled);
