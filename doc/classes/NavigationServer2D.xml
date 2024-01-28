@@ -506,6 +506,15 @@
 				Set the navigation [param map] edge connection use. If [param enabled] is [code]true[/code], the navigation map allows navigation regions to use edge connections to connect with other navigation regions within proximity of the navigation map edge connection margin.
 			</description>
 		</method>
+		<method name="map_step">
+			<return type="void" />
+			<param index="0" name="map" type="RID" />
+			<param index="1" name="delta" type="float" />
+			<description>
+				Manually advance [param map] forward in [param delta]. This can be used to manually advance the simulation multiple times in a single frame, which is useful for things like rollback netcode. Be aware that if the map is active it will still be stepped automatically at the end of each physics frame.
+				This can be changed with [method set_active].
+			</description>
+		</method>
 		<method name="obstacle_create">
 			<return type="RID" />
 			<description>
