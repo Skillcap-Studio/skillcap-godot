@@ -97,6 +97,7 @@ public:
 	virtual TypedArray<RID> map_get_obstacles(RID p_map) const;
 
 	virtual void map_force_update(RID p_map);
+	virtual void map_step(RID p_map, real_t p_delta);
 
 	/// Creates a new region.
 	virtual RID region_create();
