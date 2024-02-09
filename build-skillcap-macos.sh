@@ -10,6 +10,11 @@ scons platform=macos arch=x86_64 module_text_server_fb_enabled=yes debug_symbols
 # Compile for Apple Silicon (ARM64) powered Macs
 scons platform=macos arch=arm64 module_text_server_fb_enabled=yes debug_symbols=yes
 
+# Compile export templates
+scons platform=macos target=template_debug arch=x86_64
+scons platform=macos target=template_debug arch=arm64
+
+
 # Bundle both architectures into a single "Universal 2" binary
 lipo -create bin/godot.macos.editor.x86_64 bin/godot.macos.editor.arm64 -output bin/godot.macos.editor.universal
 
