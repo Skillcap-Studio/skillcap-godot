@@ -132,6 +132,7 @@ public:
 	virtual TypedArray<RID> map_get_obstacles(RID p_map) const override;
 
 	virtual void map_force_update(RID p_map) override;
+	virtual void map_step(RID p_map, real_t p_delta) override;
 
 	virtual RID region_create() override;
 

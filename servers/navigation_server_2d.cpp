@@ -387,7 +387,7 @@ void NavigationServer2D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("map_get_obstacles", "map"), &NavigationServer2D::map_get_obstacles);
 
 	ClassDB::bind_method(D_METHOD("map_force_update", "map"), &NavigationServer2D::map_force_update);
-
+	ClassDB::bind_method(D_METHOD("map_step", "map", "delta"), &NavigationServer2D::map_step);
 	ClassDB::bind_method(D_METHOD("query_path", "parameters", "result"), &NavigationServer2D::query_path);
 
 	ClassDB::bind_method(D_METHOD("region_create"), &NavigationServer2D::region_create);
@@ -515,6 +515,9 @@ bool FORWARD_1_C(map_is_active, RID, p_map, rid_to_rid);
 
 void NavigationServer2D::map_force_update(RID p_map) {
 	NavigationServer3D::get_singleton()->map_force_update(p_map);
+}
+void NavigationServer2D::map_step(RID p_map, real_t p_delta) {
+	NavigationServer3D::get_singleton()->map_step(p_map, p_delta);
 }
 
 void FORWARD_2(map_set_cell_size, RID, p_map, real_t, p_cell_size, rid_to_rid, real_to_real);
