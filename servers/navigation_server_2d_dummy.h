@@ -58,6 +58,7 @@ public:
 	TypedArray<RID> map_get_agents(RID p_map) const override { return TypedArray<RID>(); }
 	TypedArray<RID> map_get_obstacles(RID p_map) const override { return TypedArray<RID>(); }
 	void map_force_update(RID p_map) override {}
+	// void map_step(RID p_map, real_t p_delta) override {}
 	Vector2 map_get_random_point(RID p_map, uint32_t p_naviation_layers, bool p_uniformly) const override { return Vector2(); };
 
 	RID region_create() override { return RID(); }

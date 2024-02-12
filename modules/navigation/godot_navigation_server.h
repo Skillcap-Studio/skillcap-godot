@@ -140,6 +140,8 @@ public:
 
 	virtual void map_force_update(RID p_map) override;
 
+	virtual void map_step(RID p_map, real_t p_delta) override;
+
 	virtual Vector3 map_get_random_point(RID p_map, uint32_t p_navigation_layers, bool p_uniformly) const override;
 
 	virtual RID region_create() override;

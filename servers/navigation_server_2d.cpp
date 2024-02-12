@@ -58,6 +58,7 @@ void NavigationServer2D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("map_get_obstacles", "map"), &NavigationServer2D::map_get_obstacles);
 
 	ClassDB::bind_method(D_METHOD("map_force_update", "map"), &NavigationServer2D::map_force_update);
+	ClassDB::bind_method(D_METHOD("map_step", "map", "delta"), &NavigationServer2D::map_step);
 
 	ClassDB::bind_method(D_METHOD("map_get_random_point", "map", "navigation_layers", "uniformly"), &NavigationServer2D::map_get_random_point);
 
@@ -208,6 +209,10 @@ void NavigationServer2D::set_debug_enabled(bool p_enabled) {
 
 bool NavigationServer2D::get_debug_enabled() const {
 	return NavigationServer3D::get_singleton()->get_debug_enabled();
+}
+
+void NavigationServer2D::map_step(RID p_map, real_t p_delta) {
+	NavigationServer3D::get_singleton()->map_step(p_map, p_delta);
 }
 
 #ifdef DEBUG_ENABLED

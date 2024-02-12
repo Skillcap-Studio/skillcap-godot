@@ -114,6 +114,8 @@ public:
 
 	virtual void map_force_update(RID p_map) = 0;
 
+	virtual void map_step(RID p_map, real_t p_delta) = 0;
+
 	virtual Vector3 map_get_random_point(RID p_map, uint32_t p_navigation_layers, bool p_uniformly) const = 0;
 
 	/// Creates a new region.

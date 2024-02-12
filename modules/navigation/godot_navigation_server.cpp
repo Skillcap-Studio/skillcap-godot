@@ -1240,6 +1240,36 @@ void GodotNavigationServer::map_force_update(RID p_map) {
 	map->sync();
 }
 
+void GodotNavigationServer::map_step(RID p_map, real_t p_delta) {
+	if (!active) {
+		return;
+	}
+
+	MutexLock lock(operations_mutex);
+	NavMap *map = map_owner.get_or_null(p_map);
+	ERR_FAIL_NULL(map);
+
+	const uint32_t prev_update_id = map->get_map_update_id();
+	flush_queries();
+
+	map->sync();
+	map->step(p_delta);
+	map->dispatch_callbacks();
+
+	const uint32_t new_update_id = map->get_map_update_id();
+
+	// Emit a signal if a map changed.
+	if (new_update_id != prev_update_id) {
+		emit_signal(SNAME("map_changed"), map->get_self());
+	}
+
+	// Update the update id storage if the map is active
+	const int map_index = active_maps.find(map);
+	if (map_index >= 0) {
+		active_maps_update_id[map_index] = new_update_id;
+	}
+}
+
 void GodotNavigationServer::sync() {
 #ifndef _3D_DISABLED
 	if (navmesh_generator_3d) {
