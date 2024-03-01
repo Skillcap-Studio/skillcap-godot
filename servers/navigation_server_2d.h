@@ -103,6 +103,7 @@ public:
 
 	virtual void map_force_update(RID p_map) = 0;
 	virtual void map_step(RID p_map, real_t p_delta);
+	virtual uint32_t map_get_iteration_id(RID p_map) const = 0;
 
 	virtual Vector2 map_get_random_point(RID p_map, uint32_t p_navigation_layers, bool p_uniformly) const = 0;
 
@@ -304,6 +305,7 @@ public:
 	virtual void parse_source_geometry_data(const Ref<NavigationPolygon> &p_navigation_mesh, const Ref<NavigationMeshSourceGeometryData2D> &p_source_geometry_data, Node *p_root_node, const Callable &p_callback = Callable()) = 0;
 	virtual void bake_from_source_geometry_data(const Ref<NavigationPolygon> &p_navigation_mesh, const Ref<NavigationMeshSourceGeometryData2D> &p_source_geometry_data, const Callable &p_callback = Callable()) = 0;
 	virtual void bake_from_source_geometry_data_async(const Ref<NavigationPolygon> &p_navigation_mesh, const Ref<NavigationMeshSourceGeometryData2D> &p_source_geometry_data, const Callable &p_callback = Callable()) = 0;
+	virtual bool is_baking_navigation_polygon(Ref<NavigationPolygon> p_navigation_polygon) const = 0;
 
 	NavigationServer2D();
 	~NavigationServer2D() override;

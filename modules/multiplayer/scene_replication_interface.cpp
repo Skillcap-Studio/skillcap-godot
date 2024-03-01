@@ -421,7 +421,7 @@ Error SceneReplicationInterface::_update_spawn_visibility(int p_peer, const Obje
 		// Check visibility for each peers.
 		for (const KeyValue<int, PeerInfo> &E : peers_info) {
 			if (is_visible) {
-				// This is fast, since the the object is visible to everyone, we don't need to check each peer.
+				// This is fast, since the object is visible to everyone, we don't need to check each peer.
 				if (E.value.spawn_nodes.has(p_oid)) {
 					// Already spawned.
 					continue;
@@ -783,7 +783,7 @@ Error SceneReplicationInterface::on_delta_receive(int p_from, const uint8_t *p_b
 			ERR_CONTINUE_MSG(true, "Ignoring delta for non-authority or invalid synchronizer.");
 		}
 		List<NodePath> props = sync->get_delta_properties(indexes);
-		ERR_FAIL_COND_V(props.size() == 0, ERR_INVALID_DATA);
+		ERR_FAIL_COND_V(props.is_empty(), ERR_INVALID_DATA);
 		Vector<Variant> vars;
 		vars.resize(props.size());
 		int consumed = 0;

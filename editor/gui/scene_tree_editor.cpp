@@ -750,7 +750,7 @@ bool SceneTreeEditor::_update_filter(TreeItem *p_parent, bool p_scroll_to_select
 	return p_parent->is_visible();
 }
 
-bool SceneTreeEditor::_item_matches_all_terms(TreeItem *p_item, PackedStringArray p_terms) {
+bool SceneTreeEditor::_item_matches_all_terms(TreeItem *p_item, const PackedStringArray &p_terms) {
 	if (p_terms.is_empty()) {
 		return true;
 	}
@@ -767,7 +767,7 @@ bool SceneTreeEditor::_item_matches_all_terms(TreeItem *p_item, PackedStringArra
 				// Filter by Type.
 				String type = get_node(p_item->get_metadata(0))->get_class();
 				bool term_in_inherited_class = false;
-				// Every Node is is a Node, duh!
+				// Every Node is a Node, duh!
 				while (type != "Node") {
 					if (type.to_lower().contains(argument)) {
 						term_in_inherited_class = true;
@@ -1637,7 +1637,7 @@ void SceneTreeDialog::set_valid_types(const Vector<StringName> &p_valid) {
 		Label *label = memnew(Label);
 		hb->add_child(label);
 		label->set_text(name);
-		label->set_auto_translate(false);
+		label->set_auto_translate_mode(AUTO_TRANSLATE_MODE_DISABLED);
 	}
 
 	show_all_nodes->show();

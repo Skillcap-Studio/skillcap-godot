@@ -861,7 +861,7 @@ void CanvasItemEditor::_restore_canvas_item_state(const List<CanvasItem *> &p_ca
 	}
 }
 
-void CanvasItemEditor::_commit_canvas_item_state(const List<CanvasItem *> &p_canvas_items, String action_name, bool commit_bones) {
+void CanvasItemEditor::_commit_canvas_item_state(const List<CanvasItem *> &p_canvas_items, const String &action_name, bool commit_bones) {
 	List<CanvasItem *> modified_canvas_items;
 	for (CanvasItem *ci : p_canvas_items) {
 		Dictionary old_state = editor_selection->get_node_editor_data<CanvasItemEditorSelectedItem>(ci)->undo_state;
@@ -1285,25 +1285,25 @@ bool CanvasItemEditor::_gui_input_zoom_or_pan(const Ref<InputEvent> &p_event, bo
 	Ref<InputEventKey> k = p_event;
 	if (k.is_valid()) {
 		if (k->is_pressed()) {
-			if (ED_GET_SHORTCUT("canvas_item_editor/zoom_3.125_percent")->matches_event(p_event)) {
+			if (ED_IS_SHORTCUT("canvas_item_editor/zoom_3.125_percent", p_event)) {
 				_shortcut_zoom_set(1.0 / 32.0);
-			} else if (ED_GET_SHORTCUT("canvas_item_editor/zoom_6.25_percent")->matches_event(p_event)) {
+			} else if (ED_IS_SHORTCUT("canvas_item_editor/zoom_6.25_percent", p_event)) {
 				_shortcut_zoom_set(1.0 / 16.0);
-			} else if (ED_GET_SHORTCUT("canvas_item_editor/zoom_12.5_percent")->matches_event(p_event)) {
+			} else if (ED_IS_SHORTCUT("canvas_item_editor/zoom_12.5_percent", p_event)) {
 				_shortcut_zoom_set(1.0 / 8.0);
-			} else if (ED_GET_SHORTCUT("canvas_item_editor/zoom_25_percent")->matches_event(p_event)) {
+			} else if (ED_IS_SHORTCUT("canvas_item_editor/zoom_25_percent", p_event)) {
 				_shortcut_zoom_set(1.0 / 4.0);
-			} else if (ED_GET_SHORTCUT("canvas_item_editor/zoom_50_percent")->matches_event(p_event)) {
+			} else if (ED_IS_SHORTCUT("canvas_item_editor/zoom_50_percent", p_event)) {
 				_shortcut_zoom_set(1.0 / 2.0);
-			} else if (ED_GET_SHORTCUT("canvas_item_editor/zoom_100_percent")->matches_event(p_event)) {
+			} else if (ED_IS_SHORTCUT("canvas_item_editor/zoom_100_percent", p_event)) {
 				_shortcut_zoom_set(1.0);
-			} else if (ED_GET_SHORTCUT("canvas_item_editor/zoom_200_percent")->matches_event(p_event)) {
+			} else if (ED_IS_SHORTCUT("canvas_item_editor/zoom_200_percent", p_event)) {
 				_shortcut_zoom_set(2.0);
-			} else if (ED_GET_SHORTCUT("canvas_item_editor/zoom_400_percent")->matches_event(p_event)) {
+			} else if (ED_IS_SHORTCUT("canvas_item_editor/zoom_400_percent", p_event)) {
 				_shortcut_zoom_set(4.0);
-			} else if (ED_GET_SHORTCUT("canvas_item_editor/zoom_800_percent")->matches_event(p_event)) {
+			} else if (ED_IS_SHORTCUT("canvas_item_editor/zoom_800_percent", p_event)) {
 				_shortcut_zoom_set(8.0);
-			} else if (ED_GET_SHORTCUT("canvas_item_editor/zoom_1600_percent")->matches_event(p_event)) {
+			} else if (ED_IS_SHORTCUT("canvas_item_editor/zoom_1600_percent", p_event)) {
 				_shortcut_zoom_set(16.0);
 			}
 		}
@@ -2708,7 +2708,7 @@ Control::CursorShape CanvasItemEditor::get_cursor_shape(const Point2 &p_pos) con
 	return c;
 }
 
-void CanvasItemEditor::_draw_text_at_position(Point2 p_position, String p_string, Side p_side) {
+void CanvasItemEditor::_draw_text_at_position(Point2 p_position, const String &p_string, Side p_side) {
 	Color color = get_theme_color(SNAME("font_color"), EditorStringName(Editor));
 	color.a = 0.8;
 	Ref<Font> font = get_theme_font(SNAME("font"), SNAME("Label"));
@@ -3684,65 +3684,63 @@ void CanvasItemEditor::_draw_hover() {
 	}
 }
 
-void CanvasItemEditor::_draw_transform_message() {
-	if (drag_type == DRAG_NONE || drag_selection.is_empty() || !drag_selection.front()->get()) {
-		return;
-	}
-	String transform_message;
-	Transform2D current_transform = drag_selection.front()->get()->get_global_transform();
+void CanvasItemEditor::_draw_message() {
+	if (drag_type != DRAG_NONE && !drag_selection.is_empty() && drag_selection.front()->get()) {
+		Transform2D current_transform = drag_selection.front()->get()->get_global_transform();
 
-	double snap = EDITOR_GET("interface/inspector/default_float_step");
-	int snap_step_decimals = Math::range_step_decimals(snap);
+		double snap = EDITOR_GET("interface/inspector/default_float_step");
+		int snap_step_decimals = Math::range_step_decimals(snap);
 #define FORMAT(value) (TS->format_number(String::num(value, snap_step_decimals)))
 
-	switch (drag_type) {
-		case DRAG_MOVE:
-		case DRAG_MOVE_X:
-		case DRAG_MOVE_Y: {
-			Vector2 delta = current_transform.get_origin() - original_transform.get_origin();
-			if (drag_type == DRAG_MOVE) {
-				transform_message = TTR("Moving:") + " (" + FORMAT(delta.x) + ", " + FORMAT(delta.y) + ") px";
-			} else if (drag_type == DRAG_MOVE_X) {
-				transform_message = TTR("Moving:") + " " + FORMAT(delta.x) + " px";
-			} else if (drag_type == DRAG_MOVE_Y) {
-				transform_message = TTR("Moving:") + " " + FORMAT(delta.y) + " px";
-			}
-		} break;
+		switch (drag_type) {
+			case DRAG_MOVE:
+			case DRAG_MOVE_X:
+			case DRAG_MOVE_Y: {
+				Vector2 delta = current_transform.get_origin() - original_transform.get_origin();
+				if (drag_type == DRAG_MOVE) {
+					message = TTR("Moving:") + " (" + FORMAT(delta.x) + ", " + FORMAT(delta.y) + ") px";
+				} else if (drag_type == DRAG_MOVE_X) {
+					message = TTR("Moving:") + " " + FORMAT(delta.x) + " px";
+				} else if (drag_type == DRAG_MOVE_Y) {
+					message = TTR("Moving:") + " " + FORMAT(delta.y) + " px";
+				}
+			} break;
 
-		case DRAG_ROTATE: {
-			real_t delta = Math::rad_to_deg(current_transform.get_rotation() - original_transform.get_rotation());
-			transform_message = TTR("Rotating:") + " " + FORMAT(delta) + String::utf8(" °");
-		} break;
+			case DRAG_ROTATE: {
+				real_t delta = Math::rad_to_deg(current_transform.get_rotation() - original_transform.get_rotation());
+				message = TTR("Rotating:") + " " + FORMAT(delta) + String::utf8(" °");
+			} break;
 
-		case DRAG_SCALE_X:
-		case DRAG_SCALE_Y:
-		case DRAG_SCALE_BOTH: {
-			Vector2 original_scale = (Math::is_zero_approx(original_transform.get_scale().x) || Math::is_zero_approx(original_transform.get_scale().y)) ? Vector2(CMP_EPSILON, CMP_EPSILON) : original_transform.get_scale();
-			Vector2 delta = current_transform.get_scale() / original_scale;
-			if (drag_type == DRAG_SCALE_BOTH) {
-				transform_message = TTR("Scaling:") + String::utf8(" ×(") + FORMAT(delta.x) + ", " + FORMAT(delta.y) + ")";
-			} else if (drag_type == DRAG_SCALE_X) {
-				transform_message = TTR("Scaling:") + String::utf8(" ×") + FORMAT(delta.x);
-			} else if (drag_type == DRAG_SCALE_Y) {
-				transform_message = TTR("Scaling:") + String::utf8(" ×") + FORMAT(delta.y);
-			}
-		} break;
+			case DRAG_SCALE_X:
+			case DRAG_SCALE_Y:
+			case DRAG_SCALE_BOTH: {
+				Vector2 original_scale = (Math::is_zero_approx(original_transform.get_scale().x) || Math::is_zero_approx(original_transform.get_scale().y)) ? Vector2(CMP_EPSILON, CMP_EPSILON) : original_transform.get_scale();
+				Vector2 delta = current_transform.get_scale() / original_scale;
+				if (drag_type == DRAG_SCALE_BOTH) {
+					message = TTR("Scaling:") + String::utf8(" ×(") + FORMAT(delta.x) + ", " + FORMAT(delta.y) + ")";
+				} else if (drag_type == DRAG_SCALE_X) {
+					message = TTR("Scaling:") + String::utf8(" ×") + FORMAT(delta.x);
+				} else if (drag_type == DRAG_SCALE_Y) {
+					message = TTR("Scaling:") + String::utf8(" ×") + FORMAT(delta.y);
+				}
+			} break;
 
-		default:
-			break;
-	}
+			default:
+				break;
+		}
 #undef FORMAT
+	}
 
-	if (transform_message.is_empty()) {
+	if (message.is_empty()) {
 		return;
 	}
 
 	Ref<Font> font = get_theme_font(SNAME("font"), SNAME("Label"));
 	int font_size = get_theme_font_size(SNAME("font_size"), SNAME("Label"));
 	Point2 msgpos = Point2(RULER_WIDTH + 5 * EDSCALE, viewport->get_size().y - 20 * EDSCALE);
-	viewport->draw_string(font, msgpos + Point2(1, 1), transform_message, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(0, 0, 0, 0.8));
-	viewport->draw_string(font, msgpos + Point2(-1, -1), transform_message, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(0, 0, 0, 0.8));
-	viewport->draw_string(font, msgpos, transform_message, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(1, 1, 1, 1));
+	viewport->draw_string(font, msgpos + Point2(1, 1), message, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(0, 0, 0, 0.8));
+	viewport->draw_string(font, msgpos + Point2(-1, -1), message, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(0, 0, 0, 0.8));
+	viewport->draw_string(font, msgpos, message, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, Color(1, 1, 1, 1));
 }
 
 void CanvasItemEditor::_draw_locks_and_groups(Node *p_node, const Transform2D &p_parent_xform, const Transform2D &p_canvas_xform) {
@@ -3856,7 +3854,7 @@ void CanvasItemEditor::_draw_viewport() {
 	_draw_smart_snapping();
 	_draw_focus();
 	_draw_hover();
-	_draw_transform_message();
+	_draw_message();
 }
 
 void CanvasItemEditor::update_viewport() {
@@ -4010,6 +4008,10 @@ void CanvasItemEditor::_notification(int p_what) {
 		} break;
 
 		case EditorSettings::NOTIFICATION_EDITOR_SETTINGS_CHANGED: {
+			if (!EditorThemeManager::is_generated_theme_outdated() &&
+					!EditorSettings::get_singleton()->check_changed_settings_in_group("editors/panning")) {
+				break;
+			}
 			_update_editor_settings();
 		} break;
 
@@ -4736,6 +4738,7 @@ void CanvasItemEditor::_focus_selection(int p_op) {
 }
 
 void CanvasItemEditor::_reset_drag() {
+	message = "";
 	drag_type = DRAG_NONE;
 	drag_selection.clear();
 }
@@ -5315,14 +5318,8 @@ CanvasItemEditor::CanvasItemEditor() {
 	p->add_check_shortcut(ED_SHORTCUT("canvas_item_editor/use_scale_snap", TTR("Use Scale Snap")), SNAP_USE_SCALE);
 	p->add_check_shortcut(ED_SHORTCUT("canvas_item_editor/snap_relative", TTR("Snap Relative")), SNAP_RELATIVE);
 	p->add_check_shortcut(ED_SHORTCUT("canvas_item_editor/use_pixel_snap", TTR("Use Pixel Snap")), SNAP_USE_PIXEL);
-	p->add_submenu_item(TTR("Smart Snapping"), "SmartSnapping");
-
-	p->add_separator();
-	p->add_shortcut(ED_SHORTCUT("canvas_item_editor/configure_snap", TTR("Configure Snap...")), SNAP_CONFIGURE);
 
 	smartsnap_config_popup = memnew(PopupMenu);
-	p->add_child(smartsnap_config_popup);
-	smartsnap_config_popup->set_name("SmartSnapping");
 	smartsnap_config_popup->connect("id_pressed", callable_mp(this, &CanvasItemEditor::_popup_callback));
 	smartsnap_config_popup->set_hide_on_checkable_item_selection(false);
 	smartsnap_config_popup->add_check_shortcut(ED_SHORTCUT("canvas_item_editor/snap_node_parent", TTR("Snap to Parent")), SNAP_USE_NODE_PARENT);
@@ -5331,6 +5328,10 @@ CanvasItemEditor::CanvasItemEditor() {
 	smartsnap_config_popup->add_check_shortcut(ED_SHORTCUT("canvas_item_editor/snap_node_center", TTR("Snap to Node Center")), SNAP_USE_NODE_CENTER);
 	smartsnap_config_popup->add_check_shortcut(ED_SHORTCUT("canvas_item_editor/snap_other_nodes", TTR("Snap to Other Nodes")), SNAP_USE_OTHER_NODES);
 	smartsnap_config_popup->add_check_shortcut(ED_SHORTCUT("canvas_item_editor/snap_guides", TTR("Snap to Guides")), SNAP_USE_GUIDES);
+	p->add_submenu_node_item(TTR("Smart Snapping"), smartsnap_config_popup);
+
+	p->add_separator();
+	p->add_shortcut(ED_SHORTCUT("canvas_item_editor/configure_snap", TTR("Configure Snap...")), SNAP_CONFIGURE);
 
 	main_menu_hbox->add_child(memnew(VSeparator));
 
@@ -5412,14 +5413,12 @@ CanvasItemEditor::CanvasItemEditor() {
 	grid_menu = memnew(PopupMenu);
 	grid_menu->connect("about_to_popup", callable_mp(this, &CanvasItemEditor::_prepare_grid_menu));
 	grid_menu->connect("id_pressed", callable_mp(this, &CanvasItemEditor::_on_grid_menu_id_pressed));
-	grid_menu->set_name("GridMenu");
 	grid_menu->add_radio_check_item(TTR("Show"), GRID_VISIBILITY_SHOW);
 	grid_menu->add_radio_check_item(TTR("Show When Snapping"), GRID_VISIBILITY_SHOW_WHEN_SNAPPING);
 	grid_menu->add_radio_check_item(TTR("Hide"), GRID_VISIBILITY_HIDE);
 	grid_menu->add_separator();
 	grid_menu->add_shortcut(ED_SHORTCUT("canvas_item_editor/toggle_grid", TTR("Toggle Grid"), KeyModifierMask::CMD_OR_CTRL | Key::APOSTROPHE));
-	p->add_child(grid_menu);
-	p->add_submenu_item(TTR("Grid"), "GridMenu");
+	p->add_submenu_node_item(TTR("Grid"), grid_menu);
 
 	p->add_check_shortcut(ED_SHORTCUT("canvas_item_editor/show_helpers", TTR("Show Helpers"), Key::H), SHOW_HELPERS);
 	p->add_check_shortcut(ED_SHORTCUT("canvas_item_editor/show_rulers", TTR("Show Rulers")), SHOW_RULERS);
@@ -5448,12 +5447,10 @@ CanvasItemEditor::CanvasItemEditor() {
 
 	theme_menu = memnew(PopupMenu);
 	theme_menu->connect("id_pressed", callable_mp(this, &CanvasItemEditor::_switch_theme_preview));
-	theme_menu->set_name("ThemeMenu");
 	theme_menu->add_radio_check_item(TTR("Project theme"), THEME_PREVIEW_PROJECT);
 	theme_menu->add_radio_check_item(TTR("Editor theme"), THEME_PREVIEW_EDITOR);
 	theme_menu->add_radio_check_item(TTR("Default theme"), THEME_PREVIEW_DEFAULT);
-	p->add_child(theme_menu);
-	p->add_submenu_item(TTR("Preview Theme"), "ThemeMenu");
+	p->add_submenu_node_item(TTR("Preview Theme"), theme_menu);
 
 	theme_preview = (ThemePreviewMode)(int)EditorSettings::get_singleton()->get_project_metadata("2d_editor", "theme_preview", THEME_PREVIEW_PROJECT);
 	for (int i = 0; i < THEME_PREVIEW_MAX; i++) {
@@ -5544,7 +5541,7 @@ CanvasItemEditor::CanvasItemEditor() {
 	selection_menu = memnew(PopupMenu);
 	add_child(selection_menu);
 	selection_menu->set_min_size(Vector2(100, 0));
-	selection_menu->set_auto_translate(false);
+	selection_menu->set_auto_translate_mode(AUTO_TRANSLATE_MODE_DISABLED);
 	selection_menu->connect("id_pressed", callable_mp(this, &CanvasItemEditor::_selection_result_pressed));
 	selection_menu->connect("popup_hide", callable_mp(this, &CanvasItemEditor::_selection_menu_hide), CONNECT_DEFERRED);
 
@@ -5695,6 +5692,7 @@ void CanvasItemEditorViewport::_create_preview(const Vector<String> &files) cons
 
 void CanvasItemEditorViewport::_remove_preview() {
 	if (preview_node->get_parent()) {
+		canvas_item_editor->message = "";
 		for (int i = preview_node->get_child_count() - 1; i >= 0; i--) {
 			Node *node = preview_node->get_child(i);
 			node->queue_free();
@@ -5781,7 +5779,11 @@ void CanvasItemEditorViewport::_create_nodes(Node *parent, Node *child, String &
 
 	// there's nothing to be used as source position so snapping will work as absolute if enabled
 	target_position = canvas_item_editor->snap_point(target_position);
-	undo_redo->add_do_method(child, "set_global_position", target_position);
+
+	CanvasItem *parent_ci = Object::cast_to<CanvasItem>(parent);
+	Point2 local_target_pos = parent_ci ? parent_ci->get_global_transform().affine_inverse().xform(target_position) : target_position;
+
+	undo_redo->add_do_method(child, "set_position", local_target_pos);
 }
 
 bool CanvasItemEditorViewport::_create_instance(Node *parent, String &path, const Point2 &p_point) {
@@ -5807,10 +5809,12 @@ bool CanvasItemEditorViewport::_create_instance(Node *parent, String &path, cons
 	instantiated_scene->set_scene_file_path(ProjectSettings::get_singleton()->localize_path(path));
 
 	EditorUndoRedoManager *undo_redo = EditorUndoRedoManager::get_singleton();
+	EditorSelection *editor_selection = EditorNode::get_singleton()->get_editor_selection();
 	undo_redo->add_do_method(parent, "add_child", instantiated_scene, true);
 	undo_redo->add_do_method(instantiated_scene, "set_owner", edited_scene);
 	undo_redo->add_do_reference(instantiated_scene);
 	undo_redo->add_undo_method(parent, "remove_child", instantiated_scene);
+	undo_redo->add_do_method(editor_selection, "add_node", instantiated_scene);
 
 	String new_name = parent->validate_child_name(instantiated_scene);
 	EditorDebuggerNode *ed = EditorDebuggerNode::get_singleton();
@@ -5849,6 +5853,8 @@ void CanvasItemEditorViewport::_perform_drop_data() {
 
 	EditorUndoRedoManager *undo_redo = EditorUndoRedoManager::get_singleton();
 	undo_redo->create_action_for_history(TTR("Create Node"), EditorNode::get_editor_data().get_current_edited_scene_history_id());
+	EditorSelection *editor_selection = EditorNode::get_singleton()->get_editor_selection();
+	undo_redo->add_do_method(editor_selection, "clear");
 
 	for (int i = 0; i < selected_files.size(); i++) {
 		String path = selected_files[i];
@@ -5875,6 +5881,7 @@ void CanvasItemEditorViewport::_perform_drop_data() {
 			if (texture != nullptr && texture.is_valid()) {
 				Node *child = Object::cast_to<Node>(ClassDB::instantiate(default_texture_node_type));
 				_create_nodes(target_node, child, path, drop_pos);
+				undo_redo->add_do_method(editor_selection, "add_node", child);
 			}
 		}
 	}
@@ -5931,7 +5938,19 @@ bool CanvasItemEditorViewport::can_drop_data(const Point2 &p_point, const Varian
 				}
 				Transform2D trans = canvas_item_editor->get_canvas_transform();
 				preview_node->set_position((p_point - trans.get_origin()) / trans.get_scale().x);
-				label->set_text(vformat(TTR("Adding %s..."), default_texture_node_type));
+				String scene_file_path = preview_node->get_child(0)->get_scene_file_path();
+				if (scene_file_path.is_empty() || preview_node->get_tree()->get_edited_scene_root()) {
+					double snap = EDITOR_GET("interface/inspector/default_float_step");
+					int snap_step_decimals = Math::range_step_decimals(snap);
+#define FORMAT(value) (TS->format_number(String::num(value, snap_step_decimals)))
+					Vector2 preview_node_pos = preview_node->get_global_position();
+					canvas_item_editor->message = TTR("Instantiating:") + " (" + FORMAT(preview_node_pos.x) + ", " + FORMAT(preview_node_pos.y) + ") px";
+					label->set_text(vformat(TTR("Adding %s..."), default_texture_node_type));
+				} else {
+					canvas_item_editor->message = TTR("Creating inherited scene from: ") + scene_file_path;
+				}
+
+				canvas_item_editor->update_viewport();
 			}
 			return can_instantiate;
 		}

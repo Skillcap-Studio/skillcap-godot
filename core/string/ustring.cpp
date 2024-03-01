@@ -1044,17 +1044,17 @@ String String::_camelcase_to_underscore() const {
 	int start_index = 0;
 
 	for (int i = 1; i < size(); i++) {
-		bool is_prev_upper = is_ascii_upper_case(cstr[i - 1]);
-		bool is_prev_lower = is_ascii_lower_case(cstr[i - 1]);
+		bool is_prev_upper = is_unicode_upper_case(cstr[i - 1]);
+		bool is_prev_lower = is_unicode_lower_case(cstr[i - 1]);
 		bool is_prev_digit = is_digit(cstr[i - 1]);
 
-		bool is_curr_upper = is_ascii_upper_case(cstr[i]);
-		bool is_curr_lower = is_ascii_lower_case(cstr[i]);
+		bool is_curr_upper = is_unicode_upper_case(cstr[i]);
+		bool is_curr_lower = is_unicode_lower_case(cstr[i]);
 		bool is_curr_digit = is_digit(cstr[i]);
 
 		bool is_next_lower = false;
 		if (i + 1 < size()) {
-			is_next_lower = is_ascii_lower_case(cstr[i + 1]);
+			is_next_lower = is_unicode_lower_case(cstr[i + 1]);
 		}
 
 		const bool cond_a = is_prev_lower && is_curr_upper; // aA
@@ -1438,7 +1438,7 @@ Vector<int> String::split_ints_mk(const Vector<String> &p_splitters, bool p_allo
 	return ret;
 }
 
-String String::join(Vector<String> parts) const {
+String String::join(const Vector<String> &parts) const {
 	String ret;
 	for (int i = 0; i < parts.size(); ++i) {
 		if (i > 0) {
@@ -1536,7 +1536,7 @@ String String::num(double p_num, int p_decimals) {
 		fmt[5] = 'f';
 		fmt[6] = 0;
 	}
-	// if we want to convert a double with as much decimal places as as
+	// if we want to convert a double with as much decimal places as
 	// DBL_MAX or DBL_MIN then we would theoretically need a buffer of at least
 	// DBL_MAX_10_EXP + 2 for DBL_MAX and DBL_MAX_10_EXP + 4 for DBL_MIN.
 	// BUT those values where still giving me exceptions, so I tested from
