@@ -3410,6 +3410,26 @@ bool Main::start() {
 	}
 #endif
 
+	HashMap<StringName, ProjectSettings::AutoloadInfo> autoloads;
+	if (!project_manager && !editor) {
+		if (!game_path.is_empty() && !script.is_empty()) {
+			//autoload
+			OS::get_singleton()->benchmark_begin_measure("Startup", "Load Autoloads");
+			autoloads = ProjectSettings::get_singleton()->get_autoload_list();
+
+			//first pass, add the constants so they exist before any script is loaded
+			for (const KeyValue<StringName, ProjectSettings::AutoloadInfo> &E : autoloads) {
+				const ProjectSettings::AutoloadInfo &info = E.value;
+
+				if (info.is_singleton) {
+					for (int i = 0; i < ScriptServer::get_language_count(); i++) {
+						ScriptServer::get_language(i)->add_global_constant(info.name, Variant());
+					}
+				}
+			}
+		}
+	}
+
 	MainLoop *main_loop = nullptr;
 	if (editor) {
 		main_loop = memnew(SceneTree);
@@ -3533,21 +3553,6 @@ bool Main::start() {
 
 		if (!project_manager && !editor) { // game
 			if (!game_path.is_empty() || !script.is_empty()) {
-				//autoload
-				OS::get_singleton()->benchmark_begin_measure("Startup", "Load Autoloads");
-				HashMap<StringName, ProjectSettings::AutoloadInfo> autoloads = ProjectSettings::get_singleton()->get_autoload_list();
-
-				//first pass, add the constants so they exist before any script is loaded
-				for (const KeyValue<StringName, ProjectSettings::AutoloadInfo> &E : autoloads) {
-					const ProjectSettings::AutoloadInfo &info = E.value;
-
-					if (info.is_singleton) {
-						for (int i = 0; i < ScriptServer::get_language_count(); i++) {
-							ScriptServer::get_language(i)->add_global_constant(info.name, Variant());
-						}
-					}
-				}
-
 				//second pass, load into global constants
 				List<Node *> to_add;
 				for (const KeyValue<StringName, ProjectSettings::AutoloadInfo> &E : autoloads) {

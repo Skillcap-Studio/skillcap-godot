@@ -13,14 +13,15 @@ scons platform=macos arch=arm64 module_text_server_fb_enabled=yes
 # Compile export templates
 scons platform=macos target=template_debug arch=x86_64
 scons platform=macos target=template_debug arch=arm64
-
+scons platform=macos target=template_release arch=x86_64
+scons platform=macos target=template_release arch=arm64
 
 # Bundle both architectures into a single "Universal 2" binary
 lipo -create bin/godot.macos.editor.x86_64 bin/godot.macos.editor.arm64 -output bin/godot.macos.editor.universal
 
 # Check if build directory exists, if not create it
 if [ ! -d "build" ]; then
-  mkdir build
+	mkdir build
 fi
 
 # Create an .app bundle
