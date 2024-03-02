@@ -3412,7 +3412,7 @@ bool Main::start() {
 
 	HashMap<StringName, ProjectSettings::AutoloadInfo> autoloads;
 	if (!project_manager && !editor) {
-		if (!game_path.is_empty() && !script.is_empty()) {
+		if (!game_path.is_empty() || !script.is_empty()) {
 			//autoload
 			OS::get_singleton()->benchmark_begin_measure("Startup", "Load Autoloads");
 			autoloads = ProjectSettings::get_singleton()->get_autoload_list();
