@@ -930,17 +930,17 @@ if selected_platform in platform_list:
 
     GLSL_BUILDERS = {
         "RD_GLSL": env.Builder(
-            action=env.Run(glsl_builders.build_rd_headers, 'Building RD_GLSL header: "$TARGET"'),
+            action=env.Run(glsl_builders.build_rd_headers),
             suffix="glsl.gen.h",
             src_suffix=".glsl",
         ),
         "GLSL_HEADER": env.Builder(
-            action=env.Run(glsl_builders.build_raw_headers, 'Building GLSL header: "$TARGET"'),
+            action=env.Run(glsl_builders.build_raw_headers),
             suffix="glsl.gen.h",
             src_suffix=".glsl",
         ),
         "GLES3_GLSL": env.Builder(
-            action=env.Run(gles3_builders.build_gles3_headers, 'Building GLES3 GLSL header: "$TARGET"'),
+            action=env.Run(gles3_builders.build_gles3_headers),
             suffix="glsl.gen.h",
             src_suffix=".glsl",
         ),
@@ -956,25 +956,25 @@ if selected_platform in platform_list:
         env.vs_incs = []
         env.vs_srcs = []
 
-    if env["compiledb"]:
+    # CompileDB
+    from SCons import __version__ as scons_raw_version
+
+    scons_ver = env._get_major_minor_revision(scons_raw_version)
+    if env["compiledb"] and scons_ver < (4, 0, 0):
         # Generating the compilation DB (`compile_commands.json`) requires SCons 4.0.0 or later.
-        from SCons import __version__ as scons_raw_version
-
-        scons_ver = env._get_major_minor_revision(scons_raw_version)
-
-        if scons_ver < (4, 0, 0):
-            print("The `compiledb=yes` option requires SCons 4.0 or later, but your version is %s." % scons_raw_version)
-            Exit(255)
-
+        print("The `compiledb=yes` option requires SCons 4.0 or later, but your version is %s." % scons_raw_version)
+        Exit(255)
+    if scons_ver >= (4, 0, 0):
         env.Tool("compilation_db")
         env.Alias("compiledb", env.CompilationDatabase())
 
+    # Threads
     if env["threads"]:
         env.Append(CPPDEFINES=["THREADS_ENABLED"])
 
+    # Build subdirs, the build order is dependent on link order.
     Export("env")
 
-    # Build subdirs, the build order is dependent on link order.
     SConscript("core/SCsub")
     SConscript("servers/SCsub")
     SConscript("scene/SCsub")
@@ -1038,3 +1038,13 @@ def print_elapsed_time():
 
 
 atexit.register(print_elapsed_time)
+
+
+def purge_flaky_files():
+    for build_failure in GetBuildFailures():
+        path = build_failure.node.abspath
+        if os.path.isfile(path):
+            os.remove(path)
+
+
+atexit.register(purge_flaky_files)

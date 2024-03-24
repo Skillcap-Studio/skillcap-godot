@@ -626,11 +626,13 @@ void EditorSettings::_load_defaults(Ref<ConfigFile> p_extra_config) {
 	EDITOR_SETTING(Variant::INT, PROPERTY_HINT_RANGE, "text_editor/behavior/navigation/v_scroll_speed", 80, "1,10000,1")
 	_initial_set("text_editor/behavior/navigation/drag_and_drop_selection", true);
 	_initial_set("text_editor/behavior/navigation/stay_in_script_editor_on_node_selected", true);
+	_initial_set("text_editor/behavior/navigation/open_script_when_connecting_signal_to_existing_method", true);
 
 	// Behavior: Indent
 	EDITOR_SETTING(Variant::INT, PROPERTY_HINT_ENUM, "text_editor/behavior/indent/type", 0, "Tabs,Spaces")
 	EDITOR_SETTING(Variant::INT, PROPERTY_HINT_RANGE, "text_editor/behavior/indent/size", 4, "1,64,1") // size of 0 crashes.
 	_initial_set("text_editor/behavior/indent/auto_indent", true);
+	_initial_set("text_editor/behavior/indent/indent_wrapped_lines", true);
 
 	// Behavior: Files
 	_initial_set("text_editor/behavior/files/trim_trailing_whitespace_on_save", false);
@@ -837,6 +839,7 @@ void EditorSettings::_load_defaults(Ref<ConfigFile> p_extra_config) {
 
 	// TRANSLATORS: Project Manager here refers to the tool used to create/manage Godot projects.
 	EDITOR_SETTING(Variant::INT, PROPERTY_HINT_ENUM, "project_manager/sorting_order", 0, "Last Edited,Name,Path")
+	EDITOR_SETTING(Variant::INT, PROPERTY_HINT_ENUM, "project_manager/directory_naming_convention", 1, "No convention,kebab-case,snake_case,camelCase,PascalCase,Title Case")
 
 #if defined(WEB_ENABLED)
 	// Web platform only supports `gl_compatibility`.
@@ -1060,6 +1063,9 @@ void EditorSettings::setup_language() {
 
 	// Load class reference translation.
 	load_doc_translations(lang);
+
+	// Load extractable translation for projects.
+	load_extractable_translations(lang);
 }
 
 void EditorSettings::setup_network() {
@@ -1781,6 +1787,35 @@ void EditorSettings::notify_changes() {
 	}
 	root->propagate_notification(NOTIFICATION_EDITOR_SETTINGS_CHANGED);
 }
+
+#ifdef TOOLS_ENABLED
+void EditorSettings::get_argument_options(const StringName &p_function, int p_idx, List<String> *r_options) const {
+	const String pf = p_function;
+	if (p_idx == 0) {
+		if (pf == "has_setting" || pf == "set_setting" || pf == "get_setting" || pf == "erase" ||
+				pf == "set_initial_value" || pf == "set_as_basic" || pf == "mark_setting_changed") {
+			for (const KeyValue<String, VariantContainer> &E : props) {
+				if (E.value.hide_from_editor) {
+					continue;
+				}
+
+				r_options->push_back(E.key.quote());
+			}
+		} else if (pf == "get_project_metadata" && project_metadata.is_valid()) {
+			List<String> sections;
+			project_metadata->get_sections(&sections);
+			for (const String &section : sections) {
+				r_options->push_back(section.quote());
+			}
+		} else if (pf == "set_builtin_action_override") {
+			for (const StringName &action : InputMap::get_singleton()->get_actions()) {
+				r_options->push_back(String(action).quote());
+			}
+		}
+	}
+	Object::get_argument_options(p_function, p_idx, r_options);
+}
+#endif
 
 void EditorSettings::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("has_setting", "name"), &EditorSettings::has_setting);

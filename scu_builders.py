@@ -1,5 +1,6 @@
 """Functions used to generate scu build source files during build time
 """
+
 import glob, os
 import math
 from pathlib import Path
@@ -7,7 +8,7 @@ from os.path import normpath, basename
 
 base_folder_path = str(Path(__file__).parent) + "/"
 base_folder_only = os.path.basename(os.path.normpath(base_folder_path))
-_verbose = True  # Set manually for debug prints
+_verbose = False  # Set manually for debug prints
 _scu_folders = set()
 _max_includes_per_scu = 1024
 

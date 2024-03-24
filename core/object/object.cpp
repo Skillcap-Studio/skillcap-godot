@@ -688,6 +688,59 @@ bool Object::has_method(const StringName &p_method) const {
 	return false;
 }
 
+int Object::_get_method_argument_count_bind(const StringName &p_method) const {
+	return get_method_argument_count(p_method);
+}
+
+int Object::get_method_argument_count(const StringName &p_method, bool *r_is_valid) const {
+	if (p_method == CoreStringNames::get_singleton()->_free) {
+		if (r_is_valid) {
+			*r_is_valid = true;
+		}
+		return 0;
+	}
+
+	if (script_instance) {
+		bool valid = false;
+		int ret = script_instance->get_method_argument_count(p_method, &valid);
+		if (valid) {
+			if (r_is_valid) {
+				*r_is_valid = true;
+			}
+			return ret;
+		}
+	}
+
+	{
+		bool valid = false;
+		int ret = ClassDB::get_method_argument_count(get_class_name(), p_method, &valid);
+		if (valid) {
+			if (r_is_valid) {
+				*r_is_valid = true;
+			}
+			return ret;
+		}
+	}
+
+	const Script *scr = Object::cast_to<Script>(this);
+	while (scr != nullptr) {
+		bool valid = false;
+		int ret = scr->get_script_method_argument_count(p_method, &valid);
+		if (valid) {
+			if (r_is_valid) {
+				*r_is_valid = true;
+			}
+			return ret;
+		}
+		scr = scr->get_base_script().ptr();
+	}
+
+	if (r_is_valid) {
+		*r_is_valid = false;
+	}
+	return 0;
+}
+
 Variant Object::getvar(const Variant &p_key, bool *r_valid) const {
 	if (r_valid) {
 		*r_valid = false;
@@ -1483,10 +1536,15 @@ String Object::tr(const StringName &p_message, const StringName &p_context) cons
 	}
 
 	if (Engine::get_singleton()->is_editor_hint()) {
+		String tr_msg = TranslationServer::get_singleton()->extractable_translate(p_message, p_context);
+		if (!tr_msg.is_empty() && tr_msg != p_message) {
+			return tr_msg;
+		}
+
 		return TranslationServer::get_singleton()->tool_translate(p_message, p_context);
-	} else {
-		return TranslationServer::get_singleton()->translate(p_message, p_context);
 	}
+
+	return TranslationServer::get_singleton()->translate(p_message, p_context);
 }
 
 String Object::tr_n(const StringName &p_message, const StringName &p_message_plural, int p_n, const StringName &p_context) const {
@@ -1499,10 +1557,15 @@ String Object::tr_n(const StringName &p_message, const StringName &p_message_plu
 	}
 
 	if (Engine::get_singleton()->is_editor_hint()) {
+		String tr_msg = TranslationServer::get_singleton()->extractable_translate_plural(p_message, p_message_plural, p_n, p_context);
+		if (!tr_msg.is_empty() && tr_msg != p_message && tr_msg != p_message_plural) {
+			return tr_msg;
+		}
+
 		return TranslationServer::get_singleton()->tool_translate_plural(p_message, p_message_plural, p_n, p_context);
-	} else {
-		return TranslationServer::get_singleton()->translate_plural(p_message, p_message_plural, p_n, p_context);
 	}
+
+	return TranslationServer::get_singleton()->translate_plural(p_message, p_message_plural, p_n, p_context);
 }
 
 void Object::_clear_internal_resource_paths(const Variant &p_var) {
@@ -1633,6 +1696,8 @@ void Object::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("callv", "method", "arg_array"), &Object::callv);
 
 	ClassDB::bind_method(D_METHOD("has_method", "method"), &Object::has_method);
+
+	ClassDB::bind_method(D_METHOD("get_method_argument_count", "method"), &Object::_get_method_argument_count_bind);
 
 	ClassDB::bind_method(D_METHOD("has_signal", "signal"), &Object::has_signal);
 	ClassDB::bind_method(D_METHOD("get_signal_list"), &Object::_get_signal_list);
@@ -2086,15 +2151,17 @@ void ObjectDB::debug_objects(DebugFunc p_func) {
 	spin_lock.unlock();
 }
 
+#ifdef TOOLS_ENABLED
 void Object::get_argument_options(const StringName &p_function, int p_idx, List<String> *r_options) const {
+	const String pf = p_function;
 	if (p_idx == 0) {
-		if (p_function == "connect" || p_function == "is_connected" || p_function == "disconnect" || p_function == "emit_signal" || p_function == "has_signal") {
+		if (pf == "connect" || pf == "is_connected" || pf == "disconnect" || pf == "emit_signal" || pf == "has_signal") {
 			List<MethodInfo> signals;
 			get_signal_list(&signals);
 			for (const MethodInfo &E : signals) {
 				r_options->push_back(E.name.quote());
 			}
-		} else if (p_function == "call" || p_function == "call_deferred" || p_function == "callv" || p_function == "has_method") {
+		} else if (pf == "call" || pf == "call_deferred" || pf == "callv" || pf == "has_method") {
 			List<MethodInfo> methods;
 			get_method_list(&methods);
 			for (const MethodInfo &E : methods) {
@@ -2103,7 +2170,7 @@ void Object::get_argument_options(const StringName &p_function, int p_idx, List<
 				}
 				r_options->push_back(E.name.quote());
 			}
-		} else if (p_function == "set" || p_function == "set_deferred" || p_function == "get") {
+		} else if (pf == "set" || pf == "set_deferred" || pf == "get") {
 			List<PropertyInfo> properties;
 			get_property_list(&properties);
 			for (const PropertyInfo &E : properties) {
@@ -2111,13 +2178,13 @@ void Object::get_argument_options(const StringName &p_function, int p_idx, List<
 					r_options->push_back(E.name.quote());
 				}
 			}
-		} else if (p_function == "set_meta" || p_function == "get_meta" || p_function == "has_meta" || p_function == "remove_meta") {
+		} else if (pf == "set_meta" || pf == "get_meta" || pf == "has_meta" || pf == "remove_meta") {
 			for (const KeyValue<StringName, Variant> &K : metadata) {
 				r_options->push_back(String(K.key).quote());
 			}
 		}
 	} else if (p_idx == 2) {
-		if (p_function == "connect") {
+		if (pf == "connect") {
 			// Ideally, the constants should be inferred by the parameter.
 			// But a parameter's PropertyInfo does not store the enum they come from, so this will do for now.
 			List<StringName> constants;
@@ -2128,6 +2195,7 @@ void Object::get_argument_options(const StringName &p_function, int p_idx, List<
 		}
 	}
 }
+#endif
 
 SpinLock ObjectDB::spin_lock;
 uint32_t ObjectDB::slot_count = 0;
@@ -2245,8 +2313,9 @@ void ObjectDB::cleanup() {
 						extra_info = " - Resource path: " + String(resource_get_path->call(obj, nullptr, 0, call_error));
 					}
 
-					uint64_t id = uint64_t(i) | (uint64_t(object_slots[i].validator) << OBJECTDB_VALIDATOR_BITS) | (object_slots[i].is_ref_counted ? OBJECTDB_REFERENCE_BIT : 0);
-					print_line("Leaked instance: " + String(obj->get_class()) + ":" + itos(id) + extra_info);
+					uint64_t id = uint64_t(i) | (uint64_t(object_slots[i].validator) << OBJECTDB_SLOT_MAX_COUNT_BITS) | (object_slots[i].is_ref_counted ? OBJECTDB_REFERENCE_BIT : 0);
+					DEV_ASSERT(id == (uint64_t)obj->get_instance_id()); // We could just use the id from the object, but this check may help catching memory corruption catastrophes.
+					print_line("Leaked instance: " + String(obj->get_class()) + ":" + uitos(id) + extra_info);
 
 					count--;
 				}
