@@ -43,6 +43,8 @@ class Animation : public Resource {
 public:
 	typedef uint32_t TypeHash;
 
+	static inline String PARAMETERS_BASE_PATH = "parameters/";
+
 	enum TrackType {
 		TYPE_VALUE, // Set a value in a property, can be interpolated.
 		TYPE_POSITION_3D, // Position 3D track, can be compressed.
@@ -75,6 +77,7 @@ public:
 		LOOP_PINGPONG,
 	};
 
+	// LoopedFlag is used in Animataion to "process the keys at both ends correct".
 	enum LoopedFlag {
 		LOOPED_FLAG_NONE,
 		LOOPED_FLAG_END,
@@ -187,6 +190,7 @@ private:
 	};
 
 	/* BEZIER TRACK */
+
 	struct BezierKey {
 		Vector2 in_handle; // Relative (x always <0)
 		Vector2 out_handle; // Relative (x always >0)
@@ -223,7 +227,7 @@ private:
 		}
 	};
 
-	/* AUDIO TRACK */
+	/* ANIMATION TRACK */
 
 	struct AnimationTrack : public Track {
 		Vector<TKey<StringName>> values;
@@ -264,8 +268,10 @@ private:
 	_FORCE_INLINE_ void _track_get_key_indices_in_range(const Vector<T> &p_array, double from_time, double to_time, List<int> *p_indices, bool p_is_backward) const;
 
 	double length = 1.0;
-	real_t step = 0.1;
+	real_t step = 1.0 / 30;
 	LoopMode loop_mode = LOOP_NONE;
+	bool capture_included = false;
+	void _check_capture_included();
 
 	void _track_update_hash(int p_track);
 
@@ -389,6 +395,9 @@ protected:
 public:
 	int add_track(TrackType p_type, int p_at_pos = -1);
 	void remove_track(int p_track);
+
+	void set_capture_included(bool p_capture_included);
+	bool is_capture_included() const;
 
 	int get_track_count() const;
 	TrackType track_get_type(int p_track) const;

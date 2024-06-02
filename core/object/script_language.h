@@ -124,7 +124,11 @@ protected:
 	TypedArray<Dictionary> _get_script_signal_list();
 	Dictionary _get_script_constant_map();
 
+	void _set_debugger_break_language();
+
 public:
+	virtual void reload_from_file() override;
+
 	virtual bool can_instantiate() const = 0;
 
 	virtual Ref<Script> get_base_script() const = 0; //for script inheritance

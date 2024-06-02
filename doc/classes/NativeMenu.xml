@@ -53,7 +53,7 @@
 				An [param accelerator] can optionally be defined, which is a keyboard shortcut that can be pressed to trigger the menu button even if it's not currently open. The [param accelerator] is generally a combination of [enum KeyModifierMask]s and [enum Key]s using bitwise OR such as [code]KEY_MASK_CTRL | KEY_A[/code] ([kbd]Ctrl + A[/kbd]).
 				[b]Note:[/b] The [param callback] and [param key_callback] Callables need to accept exactly one Variant parameter, the parameter passed to the Callables will be the value passed to [param tag].
 				[b]Note:[/b] This method is implemented on macOS and Windows.
-				[b]Note:[/b] [param accelerator] and [param key_callback] are ignored on Windows.
+				[b]Note:[/b] On Windows, [param accelerator] and [param key_callback] are ignored.
 			</description>
 		</method>
 		<method name="add_icon_check_item">
@@ -72,7 +72,7 @@
 				An [param accelerator] can optionally be defined, which is a keyboard shortcut that can be pressed to trigger the menu button even if it's not currently open. The [param accelerator] is generally a combination of [enum KeyModifierMask]s and [enum Key]s using bitwise OR such as [code]KEY_MASK_CTRL | KEY_A[/code] ([kbd]Ctrl + A[/kbd]).
 				[b]Note:[/b] The [param callback] and [param key_callback] Callables need to accept exactly one Variant parameter, the parameter passed to the Callables will be the value passed to [param tag].
 				[b]Note:[/b] This method is implemented on macOS and Windows.
-				[b]Note:[/b] [param accelerator] and [param key_callback] are ignored on Windows.
+				[b]Note:[/b] On Windows, [param accelerator] and [param key_callback] are ignored.
 			</description>
 		</method>
 		<method name="add_icon_item">
@@ -91,7 +91,7 @@
 				An [param accelerator] can optionally be defined, which is a keyboard shortcut that can be pressed to trigger the menu button even if it's not currently open. The [param accelerator] is generally a combination of [enum KeyModifierMask]s and [enum Key]s using bitwise OR such as [code]KEY_MASK_CTRL | KEY_A[/code] ([kbd]Ctrl + A[/kbd]).
 				[b]Note:[/b] The [param callback] and [param key_callback] Callables need to accept exactly one Variant parameter, the parameter passed to the Callables will be the value passed to [param tag].
 				[b]Note:[/b] This method is implemented on macOS and Windows.
-				[b]Note:[/b] [param accelerator] and [param key_callback] are ignored on Windows.
+				[b]Note:[/b] On Windows, [param accelerator] and [param key_callback] are ignored.
 			</description>
 		</method>
 		<method name="add_icon_radio_check_item">
@@ -111,7 +111,7 @@
 				[b]Note:[/b] Radio-checkable items just display a checkmark, but don't have any built-in checking behavior and must be checked/unchecked manually. See [method set_item_checked] for more info on how to control it.
 				[b]Note:[/b] The [param callback] and [param key_callback] Callables need to accept exactly one Variant parameter, the parameter passed to the Callables will be the value passed to [param tag].
 				[b]Note:[/b] This method is implemented on macOS and Windows.
-				[b]Note:[/b] [param accelerator] and [param key_callback] are ignored on Windows.
+				[b]Note:[/b] On Windows, [param accelerator] and [param key_callback] are ignored.
 			</description>
 		</method>
 		<method name="add_item">
@@ -129,7 +129,7 @@
 				An [param accelerator] can optionally be defined, which is a keyboard shortcut that can be pressed to trigger the menu button even if it's not currently open. The [param accelerator] is generally a combination of [enum KeyModifierMask]s and [enum Key]s using bitwise OR such as [code]KEY_MASK_CTRL | KEY_A[/code] ([kbd]Ctrl + A[/kbd]).
 				[b]Note:[/b] The [param callback] and [param key_callback] Callables need to accept exactly one Variant parameter, the parameter passed to the Callables will be the value passed to [param tag].
 				[b]Note:[/b] This method is implemented on macOS and Windows.
-				[b]Note:[/b] [param accelerator] and [param key_callback] are ignored on Windows.
+				[b]Note:[/b] On Windows, [param accelerator] and [param key_callback] are ignored.
 			</description>
 		</method>
 		<method name="add_multistate_item">
@@ -151,7 +151,7 @@
 				[b]Note:[/b] By default, there's no indication of the current item state, it should be changed manually.
 				[b]Note:[/b] The [param callback] and [param key_callback] Callables need to accept exactly one Variant parameter, the parameter passed to the Callables will be the value passed to [param tag].
 				[b]Note:[/b] This method is implemented on macOS and Windows.
-				[b]Note:[/b] [param accelerator] and [param key_callback] are ignored on Windows.
+				[b]Note:[/b] On Windows, [param accelerator] and [param key_callback] are ignored.
 			</description>
 		</method>
 		<method name="add_radio_check_item">
@@ -170,7 +170,7 @@
 				[b]Note:[/b] Radio-checkable items just display a checkmark, but don't have any built-in checking behavior and must be checked/unchecked manually. See [method set_item_checked] for more info on how to control it.
 				[b]Note:[/b] The [param callback] and [param key_callback] Callables need to accept exactly one Variant parameter, the parameter passed to the Callables will be the value passed to [param tag].
 				[b]Note:[/b] This method is implemented on macOS and Windows.
-				[b]Note:[/b] [param accelerator] and [param key_callback] are ignored on Windows.
+				[b]Note:[/b] On Windows, [param accelerator] and [param key_callback] are ignored.
 			</description>
 		</method>
 		<method name="add_separator">
@@ -211,12 +211,21 @@
 				[b]Note:[/b] This method is implemented on macOS and Windows.
 			</description>
 		</method>
+		<method name="find_item_index_with_submenu" qualifiers="const">
+			<return type="int" />
+			<param index="0" name="rid" type="RID" />
+			<param index="1" name="submenu_rid" type="RID" />
+			<description>
+				Returns the index of the item with the submenu specified by [param submenu_rid]. Indices are automatically assigned to each item by the engine, and cannot be set manually.
+				[b]Note:[/b] This method is implemented on macOS and Windows.
+			</description>
+		</method>
 		<method name="find_item_index_with_tag" qualifiers="const">
 			<return type="int" />
 			<param index="0" name="rid" type="RID" />
 			<param index="1" name="tag" type="Variant" />
 			<description>
-				Returns the index of the item with the specified [param tag]. Index is automatically assigned to each item by the engine. Index can not be set manually.
+				Returns the index of the item with the specified [param tag]. Indices are automatically assigned to each item by the engine, and cannot be set manually.
 				[b]Note:[/b] This method is implemented on macOS and Windows.
 			</description>
 		</method>
@@ -225,7 +234,7 @@
 			<param index="0" name="rid" type="RID" />
 			<param index="1" name="text" type="String" />
 			<description>
-				Returns the index of the item with the specified [param text]. Index is automatically assigned to each item by the engine. Index can not be set manually.
+				Returns the index of the item with the specified [param text]. Indices are automatically assigned to each item by the engine, and cannot be set manually.
 				[b]Note:[/b] This method is implemented on macOS and Windows.
 			</description>
 		</method>
@@ -496,7 +505,7 @@
 			<param index="0" name="rid" type="RID" />
 			<param index="1" name="is_rtl" type="bool" />
 			<description>
-				Sets the menu text layout directtion.
+				Sets the menu text layout direction from right-to-left if [param is_rtl] is [code]true[/code].
 				[b]Note:[/b] This method is implemented on macOS and Windows.
 			</description>
 		</method>

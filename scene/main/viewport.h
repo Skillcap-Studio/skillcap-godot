@@ -138,6 +138,7 @@ public:
 	enum RenderInfoType {
 		RENDER_INFO_TYPE_VISIBLE,
 		RENDER_INFO_TYPE_SHADOW,
+		RENDER_INFO_TYPE_CANVAS,
 		RENDER_INFO_TYPE_MAX
 	};
 
@@ -210,6 +211,13 @@ public:
 		VRS_TEXTURE,
 		VRS_XR,
 		VRS_MAX
+	};
+
+	enum VRSUpdateMode {
+		VRS_UPDATE_DISABLED,
+		VRS_UPDATE_ONCE,
+		VRS_UPDATE_ALWAYS,
+		VRS_UPDATE_MAX
 	};
 
 private:
@@ -336,6 +344,7 @@ private:
 
 	// VRS
 	VRSMode vrs_mode = VRS_DISABLED;
+	VRSUpdateMode vrs_update_mode = VRS_UPDATE_ONCE;
 	Ref<Texture2D> vrs_texture;
 
 	struct GUI {
@@ -344,7 +353,6 @@ private:
 		bool key_event_accepted = false;
 		HashMap<int, ObjectID> touch_focus;
 		Control *mouse_focus = nullptr;
-		Control *last_mouse_focus = nullptr;
 		Control *mouse_click_grabber = nullptr;
 		BitField<MouseButtonMask> mouse_focus_mask;
 		Control *key_focus = nullptr;
@@ -615,6 +623,7 @@ public:
 
 	bool gui_is_dragging() const;
 	bool gui_is_drag_successful() const;
+	void gui_cancel_drag();
 
 	Control *gui_find_control(const Point2 &p_global);
 
@@ -634,6 +643,9 @@ public:
 
 	void set_vrs_mode(VRSMode p_vrs_mode);
 	VRSMode get_vrs_mode() const;
+
+	void set_vrs_update_mode(VRSUpdateMode p_vrs_update_mode);
+	VRSUpdateMode get_vrs_update_mode() const;
 
 	void set_vrs_texture(Ref<Texture2D> p_texture);
 	Ref<Texture2D> get_vrs_texture() const;
@@ -843,6 +855,7 @@ VARIANT_ENUM_CAST(Viewport::DebugDraw);
 VARIANT_ENUM_CAST(Viewport::SDFScale);
 VARIANT_ENUM_CAST(Viewport::SDFOversize);
 VARIANT_ENUM_CAST(Viewport::VRSMode);
+VARIANT_ENUM_CAST(Viewport::VRSUpdateMode);
 VARIANT_ENUM_CAST(SubViewport::ClearMode);
 VARIANT_ENUM_CAST(Viewport::RenderInfo);
 VARIANT_ENUM_CAST(Viewport::RenderInfoType);

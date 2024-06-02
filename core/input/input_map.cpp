@@ -274,6 +274,13 @@ bool InputMap::event_get_action_status(const Ref<InputEvent> &p_event, const Str
 		if (r_raw_strength != nullptr) {
 			*r_raw_strength = strength;
 		}
+		if (r_event_index) {
+			if (input_event_action->get_event_index() >= 0) {
+				*r_event_index = input_event_action->get_event_index();
+			} else {
+				*r_event_index = E->value.inputs.size();
+			}
+		}
 		return input_event_action->get_action() == p_action;
 	}
 
@@ -383,6 +390,7 @@ static const _BuiltinActionDisplayName _builtin_action_display_names[] = {
     { "ui_text_select_all",                            TTRC("Select All") },
     { "ui_text_select_word_under_caret",               TTRC("Select Word Under Caret") },
     { "ui_text_add_selection_for_next_occurrence",     TTRC("Add Selection for Next Occurrence") },
+    { "ui_text_skip_selection_for_next_occurrence",    TTRC("Skip Selection for Next Occurrence") },
     { "ui_text_clear_carets_and_selection",            TTRC("Clear Carets and Selection") },
     { "ui_text_toggle_insert_mode",                    TTRC("Toggle Insert Mode") },
     { "ui_text_submit",                                TTRC("Submit Text") },
@@ -720,6 +728,10 @@ const HashMap<String, List<Ref<InputEvent>>> &InputMap::get_builtins() {
 	inputs = List<Ref<InputEvent>>();
 	inputs.push_back(InputEventKey::create_reference(Key::D | KeyModifierMask::CMD_OR_CTRL));
 	default_builtin_cache.insert("ui_text_add_selection_for_next_occurrence", inputs);
+
+	inputs = List<Ref<InputEvent>>();
+	inputs.push_back(InputEventKey::create_reference(Key::D | KeyModifierMask::CMD_OR_CTRL | KeyModifierMask::ALT));
+	default_builtin_cache.insert("ui_text_skip_selection_for_next_occurrence", inputs);
 
 	inputs = List<Ref<InputEvent>>();
 	inputs.push_back(InputEventKey::create_reference(Key::ESCAPE));

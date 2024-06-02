@@ -1372,9 +1372,10 @@ DynamicFontImportSettingsDialog::DynamicFontImportSettingsDialog() {
 	add_var = memnew(Button);
 	add_var->set_tooltip_text(TTR("Add configuration"));
 	page2_hb_vars->add_child(add_var);
-	add_var->connect("pressed", callable_mp(this, &DynamicFontImportSettingsDialog::_variation_add));
+	add_var->connect(SceneStringName(pressed), callable_mp(this, &DynamicFontImportSettingsDialog::_variation_add));
 
 	vars_list = memnew(Tree);
+	vars_list->set_auto_translate_mode(AUTO_TRANSLATE_MODE_DISABLED);
 	vars_list->set_custom_minimum_size(Size2(300 * EDSCALE, 0));
 	vars_list->set_hide_root(true);
 	vars_list->set_columns(2);
@@ -1413,7 +1414,7 @@ DynamicFontImportSettingsDialog::DynamicFontImportSettingsDialog() {
 	Button *btn_clear = memnew(Button);
 	btn_clear->set_text(TTR("Clear Glyph List"));
 	gl_hb->add_child(btn_clear);
-	btn_clear->connect("pressed", callable_mp(this, &DynamicFontImportSettingsDialog::_glyph_clear));
+	btn_clear->connect(SceneStringName(pressed), callable_mp(this, &DynamicFontImportSettingsDialog::_glyph_clear));
 
 	VBoxContainer *page2_0_vb = memnew(VBoxContainer);
 	page2_0_vb->set_name(TTR("Glyphs from the Translations"));
@@ -1427,6 +1428,7 @@ DynamicFontImportSettingsDialog::DynamicFontImportSettingsDialog() {
 	page2_0_vb->add_child(page2_0_description);
 
 	locale_tree = memnew(Tree);
+	locale_tree->set_auto_translate_mode(AUTO_TRANSLATE_MODE_DISABLED);
 	locale_tree->set_columns(1);
 	locale_tree->set_hide_root(true);
 	locale_tree->set_column_expand(0, true);
@@ -1444,7 +1446,7 @@ DynamicFontImportSettingsDialog::DynamicFontImportSettingsDialog() {
 	btn_fill_locales = memnew(Button);
 	btn_fill_locales->set_text(TTR("Shape all Strings in the Translations and Add Glyphs"));
 	locale_hb->add_child(btn_fill_locales);
-	btn_fill_locales->connect("pressed", callable_mp(this, &DynamicFontImportSettingsDialog::_process_locales));
+	btn_fill_locales->connect(SceneStringName(pressed), callable_mp(this, &DynamicFontImportSettingsDialog::_process_locales));
 
 	// Page 2.1 layout: Text to select glyphs
 	VBoxContainer *page2_1_vb = memnew(VBoxContainer);
@@ -1482,7 +1484,7 @@ DynamicFontImportSettingsDialog::DynamicFontImportSettingsDialog() {
 	btn_fill = memnew(Button);
 	btn_fill->set_text(TTR("Shape Text and Add Glyphs"));
 	text_hb->add_child(btn_fill);
-	btn_fill->connect("pressed", callable_mp(this, &DynamicFontImportSettingsDialog::_glyph_text_selected));
+	btn_fill->connect(SceneStringName(pressed), callable_mp(this, &DynamicFontImportSettingsDialog::_glyph_text_selected));
 
 	// Page 2.2 layout: Character map
 	VBoxContainer *page2_2_vb = memnew(VBoxContainer);
@@ -1502,6 +1504,7 @@ DynamicFontImportSettingsDialog::DynamicFontImportSettingsDialog() {
 	page2_2_vb->add_child(glyphs_split);
 
 	glyph_table = memnew(Tree);
+	glyph_table->set_auto_translate_mode(AUTO_TRANSLATE_MODE_DISABLED);
 	glyph_table->set_custom_minimum_size(Size2((30 * 16 + 100) * EDSCALE, 0));
 	glyph_table->set_columns(17);
 	glyph_table->set_column_expand(0, false);
@@ -1512,8 +1515,8 @@ DynamicFontImportSettingsDialog::DynamicFontImportSettingsDialog() {
 	for (int i = 0; i < 16; i++) {
 		glyph_table->set_column_title(i + 1, String::num_int64(i, 16));
 	}
-	glyph_table->add_theme_style_override("selected", glyph_table->get_theme_stylebox(SNAME("panel")));
-	glyph_table->add_theme_style_override("selected_focus", glyph_table->get_theme_stylebox(SNAME("panel")));
+	glyph_table->add_theme_style_override("selected", glyph_table->get_theme_stylebox(SceneStringName(panel)));
+	glyph_table->add_theme_style_override("selected_focus", glyph_table->get_theme_stylebox(SceneStringName(panel)));
 	glyph_table->add_theme_constant_override("h_separation", 0);
 	glyph_table->set_h_size_flags(Control::SIZE_EXPAND_FILL);
 	glyph_table->set_v_size_flags(Control::SIZE_EXPAND_FILL);
@@ -1521,6 +1524,7 @@ DynamicFontImportSettingsDialog::DynamicFontImportSettingsDialog() {
 	glyph_table->connect("item_activated", callable_mp(this, &DynamicFontImportSettingsDialog::_glyph_selected));
 
 	glyph_tree = memnew(Tree);
+	glyph_tree->set_auto_translate_mode(AUTO_TRANSLATE_MODE_DISABLED);
 	glyph_tree->set_custom_minimum_size(Size2(300 * EDSCALE, 0));
 	glyph_tree->set_columns(2);
 	glyph_tree->set_hide_root(true);

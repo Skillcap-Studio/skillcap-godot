@@ -43,6 +43,7 @@
 #include "audio/effects/audio_effect_distortion.h"
 #include "audio/effects/audio_effect_eq.h"
 #include "audio/effects/audio_effect_filter.h"
+#include "audio/effects/audio_effect_hard_limiter.h"
 #include "audio/effects/audio_effect_limiter.h"
 #include "audio/effects/audio_effect_panner.h"
 #include "audio/effects/audio_effect_phaser.h"
@@ -56,11 +57,11 @@
 #include "camera/camera_feed.h"
 #include "camera_server.h"
 #include "debugger/servers_debugger.h"
+#include "display/native_menu.h"
 #include "display_server.h"
 #include "movie_writer/movie_writer.h"
 #include "movie_writer/movie_writer_mjpeg.h"
 #include "movie_writer/movie_writer_pngwav.h"
-#include "native_menu.h"
 #include "rendering/renderer_compositor.h"
 #include "rendering/renderer_rd/framebuffer_cache_rd.h"
 #include "rendering/renderer_rd/storage_rd/render_data_rd.h"
@@ -93,6 +94,7 @@
 #include "physics_server_3d_wrap_mt.h"
 #include "servers/extensions/physics_server_3d_extension.h"
 #include "xr/xr_body_tracker.h"
+#include "xr/xr_controller_tracker.h"
 #include "xr/xr_face_tracker.h"
 #include "xr/xr_hand_tracker.h"
 #include "xr/xr_interface.h"
@@ -210,6 +212,7 @@ void register_server_types() {
 		GDREGISTER_CLASS(AudioEffectDelay);
 		GDREGISTER_CLASS(AudioEffectCompressor);
 		GDREGISTER_CLASS(AudioEffectLimiter);
+		GDREGISTER_CLASS(AudioEffectHardLimiter);
 		GDREGISTER_CLASS(AudioEffectPitchShift);
 		GDREGISTER_CLASS(AudioEffectPhaser);
 
@@ -322,13 +325,16 @@ void register_server_types() {
 	PhysicsServer3DManager::get_singleton()->set_default_server("GodotPhysics3D");
 
 	GDREGISTER_ABSTRACT_CLASS(XRInterface);
+	GDREGISTER_CLASS(XRVRS);
 	GDREGISTER_CLASS(XRBodyTracker);
+	GDREGISTER_CLASS(XRControllerTracker);
 	GDREGISTER_CLASS(XRFaceTracker);
 	GDREGISTER_CLASS(XRHandTracker);
 	GDREGISTER_CLASS(XRInterfaceExtension); // can't register this as virtual because we need a creation function for our extensions.
 	GDREGISTER_CLASS(XRPose);
 	GDREGISTER_CLASS(XRPositionalTracker);
 	GDREGISTER_CLASS(XRServer);
+	GDREGISTER_ABSTRACT_CLASS(XRTracker);
 #endif // _3D_DISABLED
 
 	GDREGISTER_ABSTRACT_CLASS(NavigationServer3D);

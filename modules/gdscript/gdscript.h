@@ -169,6 +169,9 @@ private:
 	GDScriptFunction *static_initializer = nullptr;
 
 	Error _static_init();
+#ifdef TOOLS_ENABLED
+	void _static_default_init(); // Initialize static variables with default values based on their types.
+#endif
 
 	int subclass_count = 0;
 	RBSet<Object *> instances;
@@ -364,6 +367,8 @@ class GDScriptInstance : public ScriptInstance {
 	bool base_ref_counted;
 
 	SelfList<GDScriptFunctionState>::List pending_func_states;
+
+	void _call_implicit_ready_recursively(GDScript *p_script);
 
 public:
 	virtual Object *get_owner() { return owner; }
@@ -629,18 +634,18 @@ public:
 
 class ResourceFormatLoaderGDScript : public ResourceFormatLoader {
 public:
-	virtual Ref<Resource> load(const String &p_path, const String &p_original_path = "", Error *r_error = nullptr, bool p_use_sub_threads = false, float *r_progress = nullptr, CacheMode p_cache_mode = CACHE_MODE_REUSE);
-	virtual void get_recognized_extensions(List<String> *p_extensions) const;
-	virtual bool handles_type(const String &p_type) const;
-	virtual String get_resource_type(const String &p_path) const;
-	virtual void get_dependencies(const String &p_path, List<String> *p_dependencies, bool p_add_types = false);
+	virtual Ref<Resource> load(const String &p_path, const String &p_original_path = "", Error *r_error = nullptr, bool p_use_sub_threads = false, float *r_progress = nullptr, CacheMode p_cache_mode = CACHE_MODE_REUSE) override;
+	virtual void get_recognized_extensions(List<String> *p_extensions) const override;
+	virtual bool handles_type(const String &p_type) const override;
+	virtual String get_resource_type(const String &p_path) const override;
+	virtual void get_dependencies(const String &p_path, List<String> *p_dependencies, bool p_add_types = false) override;
 };
 
 class ResourceFormatSaverGDScript : public ResourceFormatSaver {
 public:
-	virtual Error save(const Ref<Resource> &p_resource, const String &p_path, uint32_t p_flags = 0);
-	virtual void get_recognized_extensions(const Ref<Resource> &p_resource, List<String> *p_extensions) const;
-	virtual bool recognize(const Ref<Resource> &p_resource) const;
+	virtual Error save(const Ref<Resource> &p_resource, const String &p_path, uint32_t p_flags = 0) override;
+	virtual void get_recognized_extensions(const Ref<Resource> &p_resource, List<String> *p_extensions) const override;
+	virtual bool recognize(const Ref<Resource> &p_resource) const override;
 };
 
 #endif // GDSCRIPT_H
