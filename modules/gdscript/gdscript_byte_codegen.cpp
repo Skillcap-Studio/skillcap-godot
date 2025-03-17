@@ -34,6 +34,10 @@
 
 #include "core/debugger/engine_debugger.h"
 
+#include "modules\godot_tracy\profiler.h"
+#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules\godot_tracy\tracy\public\tracy\TracyC.h"
+
 uint32_t GDScriptByteCodeGenerator::add_parameter(const StringName &p_name, bool p_is_optional, const GDScriptDataType &p_type) {
 	function->_argument_count++;
 	function->argument_types.push_back(p_type);
@@ -170,6 +174,14 @@ void GDScriptByteCodeGenerator::write_start(GDScript *p_script, const StringName
 #ifdef DEBUG_ENABLED
 	function->func_cname = (String(function->source) + " - " + String(p_function_name)).utf8();
 	function->_func_cname = function->func_cname.get_data();
+#ifdef TRACY_ENABLE
+	function->tracy_file = String(function->source).utf8();
+	function->tracy_function = String(p_function_name).utf8();
+	function->tracy_name = String(p_function_name).utf8();
+	function->tracy_sld.file = function->tracy_file;
+	function->tracy_sld.function = function->tracy_function;
+	function->tracy_sld.name = function->tracy_name;
+#endif
 #endif
 
 	function->_static = p_static;
@@ -423,6 +435,9 @@ void GDScriptByteCodeGenerator::set_signature(const String &p_signature) {
 
 void GDScriptByteCodeGenerator::set_initial_line(int p_line) {
 	function->_initial_line = p_line;
+#ifdef TRACY_ENABLE
+	function->tracy_sld.line = p_line;
+#endif
 }
 
 #define HAS_BUILTIN_TYPE(m_var) \

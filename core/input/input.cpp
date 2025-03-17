@@ -40,6 +40,9 @@
 #include "core/os/thread.h"
 #endif
 
+#include "modules\godot_tracy\profiler.h"
+#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+
 static const char *_joy_buttons[(size_t)JoyButton::SDL_MAX] = {
 	"a",
 	"b",
@@ -660,6 +663,9 @@ Vector3 Input::get_gyroscope() const {
 }
 
 void Input::_parse_input_event_impl(const Ref<InputEvent> &p_event, bool p_is_emulated) {
+	const auto zone_name = p_event->as_text().utf8();
+	ZoneScoped;
+	ZoneName(zone_name, zone_name.size());
 	// This function does the final delivery of the input event to user land.
 	// Regardless where the event came from originally, this has to happen on the main thread.
 	DEV_ASSERT(Thread::get_caller_id() == Thread::get_main_id());

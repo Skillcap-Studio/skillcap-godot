@@ -34,6 +34,10 @@
 
 #include "core/os/os.h"
 
+#include "modules\godot_tracy\profiler.h"
+#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules\godot_tracy\tracy\public\tracy\TracyC.h"
+
 #ifdef DEBUG_ENABLED
 
 static bool _profile_count_as_native(const Object *p_base_obj, const StringName &p_methodname) {
@@ -471,6 +475,25 @@ void (*type_init_function_table[])(Variant *) = {
 #define METHOD_CALL_ON_FREED_INSTANCE_ERROR(method_pointer) "Cannot call method '" + (method_pointer)->get_name() + "' on a previously freed instance."
 
 Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_args, int p_argcount, Callable::CallError &r_err, CallState *p_state) {
+#ifdef TRACY_ENABLE
+
+	String zone_string = _script ? _script->local_name : StringName();
+	zone_string += String(_script ? "." : "") + String(tracy_sld.name); //Profiler::stringify_method(tracy_sld.name, p_args, p_argcount));
+	const auto zone_name = zone_string.utf8();
+
+	const Object *owner_obj = p_instance ? p_instance->get_owner() : nullptr;
+	CharString zone_text;
+	if (owner_obj) {
+		zone_text = String("<" + owner_obj->get_class() + "#" + itos(owner_obj->get_instance_id()) + ">").utf8();
+	}
+
+	auto zone = tracy::ScopedZone(&tracy_sld, true);
+	zone.Name(zone_name, zone_name.size());
+	zone.Text(zone_text, zone_text.size());
+#endif
+#if defined(__CLION_IDE__) || defined(__JETBRAINS_IDE__)
+}
+#else
 	OPCODES_TABLE;
 
 	if (!_code_ptr) {
@@ -1876,9 +1899,19 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				if (GDScriptLanguage::get_singleton()->profiling) {
 					call_time = OS::get_singleton()->get_ticks_usec();
 				}
+#endif
+#if defined(DEBUG_ENABLED) || defined(TRACY_ENABLE)
 				Variant::Type base_type = base->get_type();
 				Object *base_obj = base->get_validated_object();
 				StringName base_class = base_obj ? base_obj->get_class_name() : StringName();
+#endif
+#ifdef TRACY_ENABLE
+				//bool tracy_trace = Variant::has_builtin_method(base_type, *methodname);
+				String tz_name = base_obj ? String(base_class) : Variant::get_type_name(base_type);
+				tz_name += "." + String(*methodname) + "()";
+				CharString tzc_name = tz_name.utf8();
+				TracyCZoneN(tzc, "OPCODE_CALL[_ASYNC,_RETURN]", true);
+				TracyCZoneName(tzc, tzc_name, tz_name.size());
 #endif
 
 				Variant temp_ret;
@@ -1917,6 +1950,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				} else {
 					base->callp(*methodname, (const Variant **)argptrs, argc, temp_ret, err);
 				}
+				TracyCZoneEnd(tzc);
 #ifdef DEBUG_ENABLED
 
 				if (GDScriptLanguage::get_singleton()->profiling) {
@@ -2005,7 +2039,13 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 					call_time = OS::get_singleton()->get_ticks_usec();
 				}
 #endif
-
+#ifdef TRACY_ENABLE
+				auto tz_method_name = String(method->get_name()).utf8();
+				auto tz_base_name = String(*base).utf8();
+				TracyCZoneN(tzc, "OPCODE_CALL_METHOD_BIND[_RET]", true);
+				TracyCZoneName(tzc, tz_method_name, tz_method_name.size());
+				TracyCZoneText(tzc, tz_base_name, tz_base_name.size());
+#endif
 				Variant temp_ret;
 				Callable::CallError err;
 				if (call_ret) {
@@ -2015,6 +2055,7 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				} else {
 					temp_ret = method->call(base_obj, (const Variant **)argptrs, argc, err);
 				}
+				TracyCZoneEnd(tzc);
 
 #ifdef DEBUG_ENABLED
 
@@ -2073,10 +2114,16 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				GET_INSTRUCTION_ARG(ret, argc);
 
 				const Variant **argptrs = const_cast<const Variant **>(instruction_args);
+#ifdef TRACY_ENABLE
+				auto tz_method_name = String(*methodname).utf8();
+				TracyCZoneN(tzc, "OPCODE_CALL_BUILTIN_STATIC", true);
+				TracyCZoneName(tzc, tz_method_name, tz_method_name.size());
+#endif
 
 				Callable::CallError err;
 				Variant::call_static(builtin_type, *methodname, argptrs, argc, *ret, err);
 
+				TracyCZoneEnd(tzc);
 #ifdef DEBUG_ENABLED
 				if (err.error != Callable::CallError::CALL_OK) {
 					err_text = _get_call_error("static function '" + methodname->operator String() + "' in type '" + Variant::get_type_name(builtin_type) + "'", argptrs, *ret, err);
@@ -2110,10 +2157,15 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 					call_time = OS::get_singleton()->get_ticks_usec();
 				}
 #endif
-
+#ifdef TRACY_ENABLE
+				auto tz_method_name = String(method->get_name()).utf8();
+				TracyCZoneN(tzc, "OPCODE_CALL_NATIVE_STATIC", true);
+				TracyCZoneName(tzc, tz_method_name, tz_method_name.size());
+#endif
 				Callable::CallError err;
 				*ret = method->call(nullptr, argptrs, argc, err);
 
+				TracyCZoneEnd(tzc);
 #ifdef DEBUG_ENABLED
 				if (GDScriptLanguage::get_singleton()->profiling && GDScriptLanguage::get_singleton()->profile_native_calls) {
 					uint64_t t_taken = OS::get_singleton()->get_ticks_usec() - call_time;
@@ -2151,10 +2203,16 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 					call_time = OS::get_singleton()->get_ticks_usec();
 				}
 #endif
+#ifdef TRACY_ENABLE
+				auto tz_method_name = String(method->get_name()).utf8();
+				TracyCZoneN(tzc, "OPCODE_CALL_NATIVE_STATIC_VALIDATED_RETURN", true);
+				TracyCZoneName(tzc, tz_method_name, tz_method_name.size());
+#endif
 
 				GET_INSTRUCTION_ARG(ret, argc);
 				method->validated_call(nullptr, (const Variant **)argptrs, ret);
 
+				TracyCZoneEnd(tzc);
 #ifdef DEBUG_ENABLED
 				if (GDScriptLanguage::get_singleton()->profiling && GDScriptLanguage::get_singleton()->profile_native_calls) {
 					uint64_t t_taken = OS::get_singleton()->get_ticks_usec() - call_time;
@@ -2186,11 +2244,17 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 					call_time = OS::get_singleton()->get_ticks_usec();
 				}
 #endif
+#ifdef TRACY_ENABLE
+				auto tz_method_name = String(method->get_name()).utf8();
+				TracyCZoneN(tzc, "OPCODE_CALL_NATIVE_STATIC_VALIDATED_NO_RETURN", true);
+				TracyCZoneName(tzc, tz_method_name, tz_method_name.size());
+#endif
 
 				GET_INSTRUCTION_ARG(ret, argc);
 				VariantInternal::initialize(ret, Variant::NIL);
 				method->validated_call(nullptr, (const Variant **)argptrs, nullptr);
 
+				TracyCZoneEnd(tzc);
 #ifdef DEBUG_ENABLED
 				if (GDScriptLanguage::get_singleton()->profiling && GDScriptLanguage::get_singleton()->profile_native_calls) {
 					uint64_t t_taken = OS::get_singleton()->get_ticks_usec() - call_time;
@@ -2240,9 +2304,16 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				}
 #endif
 
+#ifdef TRACY_ENABLE
+				auto tz_method_name = String(method->get_name()).utf8();
+				TracyCZoneN(tzc, "OPCODE_CALL_METHOD_BIND_VALIDATED_RETURN", true);
+				TracyCZoneName(tzc, tz_method_name, tz_method_name.size());
+#endif
+
 				GET_INSTRUCTION_ARG(ret, argc + 1);
 				method->validated_call(base_obj, (const Variant **)argptrs, ret);
 
+				TracyCZoneEnd(tzc);
 #ifdef DEBUG_ENABLED
 				if (GDScriptLanguage::get_singleton()->profiling && GDScriptLanguage::get_singleton()->profile_native_calls) {
 					uint64_t t_taken = OS::get_singleton()->get_ticks_usec() - call_time;
@@ -2288,11 +2359,17 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 					call_time = OS::get_singleton()->get_ticks_usec();
 				}
 #endif
+#ifdef TRACY_ENABLE
+				auto tz_method_name = String(method->get_name()).utf8();
+				TracyCZoneN(tzc, "OPCODE_CALL_METHOD_BIND_VALIDATED_NO_RETURN", true);
+				TracyCZoneName(tzc, tz_method_name, tz_method_name.size());
+#endif
 
 				GET_INSTRUCTION_ARG(ret, argc + 1);
 				VariantInternal::initialize(ret, Variant::NIL);
 				method->validated_call(base_obj, (const Variant **)argptrs, nullptr);
 
+				TracyCZoneEnd(tzc);
 #ifdef DEBUG_ENABLED
 				if (GDScriptLanguage::get_singleton()->profiling && GDScriptLanguage::get_singleton()->profile_native_calls) {
 					uint64_t t_taken = OS::get_singleton()->get_ticks_usec() - call_time;
@@ -2321,9 +2398,14 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				Variant::ValidatedBuiltInMethod method = _builtin_methods_ptr[_code_ptr[ip + 2]];
 				Variant **argptrs = instruction_args;
 
+#ifdef TRACY_ENABLE
+				TracyCZoneN(tzc, "OPCODE_CALL_BUILTIN_TYPE_VALIDATED", true);
+#endif
+
 				GET_INSTRUCTION_ARG(ret, argc + 1);
 				method(base, (const Variant **)argptrs, argc, ret);
 
+				TracyCZoneEnd(tzc);
 				ip += 3;
 			}
 			DISPATCH_OPCODE;
@@ -2344,9 +2426,16 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 
 				GET_INSTRUCTION_ARG(dst, argc);
 
+#ifdef TRACY_ENABLE
+				auto tz_method_name = String(function).utf8();
+				TracyCZoneN(tzc, "call_utility", true);
+				TracyCZoneName(tzc, tz_method_name, tz_method_name.size());
+#endif
+
 				Callable::CallError err;
 				Variant::call_utility_function(function, dst, (const Variant **)argptrs, argc, err);
 
+				TracyCZoneEnd(tzc);
 #ifdef DEBUG_ENABLED
 				if (err.error != Callable::CallError::CALL_OK) {
 					String methodstr = function;
@@ -3895,3 +3984,4 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 
 	return retvalue;
 }
+#endif
