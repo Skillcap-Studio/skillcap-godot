@@ -57,6 +57,10 @@ static const char dummy[8] __attribute__((section("pck"), used)) = { 0 };
 #endif
 #endif
 
+#include "modules\godot_tracy\profiler.h"
+#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules\godot_tracy\tracy\public\tracy\TracyC.h"
+
 char *wc_to_utf8(const wchar_t *wc) {
 	int ulen = WideCharToMultiByte(CP_UTF8, 0, wc, -1, nullptr, 0, nullptr, nullptr);
 	char *ubuf = new char[ulen + 1];
@@ -126,6 +130,7 @@ int _main() {
 }
 
 int main(int argc, char **argv) {
+	tracy::SetThreadName("Main");
 	// override the arguments for the test handler / if symbol is provided
 	// TEST_MAIN_OVERRIDE
 

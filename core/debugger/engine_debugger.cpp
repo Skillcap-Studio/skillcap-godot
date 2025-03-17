@@ -36,6 +36,9 @@
 #include "core/debugger/script_debugger.h"
 #include "core/os/os.h"
 
+#include "modules\godot_tracy\profiler.h"
+#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+
 EngineDebugger *EngineDebugger::singleton = nullptr;
 ScriptDebugger *EngineDebugger::script_debugger = nullptr;
 
@@ -128,6 +131,7 @@ void EngineDebugger::iteration(uint64_t p_frame_ticks, uint64_t p_process_ticks,
 }
 
 void EngineDebugger::initialize(const String &p_uri, bool p_skip_breakpoints, const Vector<String> &p_breakpoints, void (*p_allow_focus_steal_fn)()) {
+	ZoneScoped;
 	register_uri_handler("tcp://", RemoteDebuggerPeerTCP::create); // TCP is the default protocol. Platforms/modules can add more.
 	if (p_uri.is_empty()) {
 		return;

@@ -36,7 +36,8 @@
 #include "core/variant/typed_array.h"
 
 /************* RESOLVER ******************/
-
+#include "modules\godot_tracy\profiler.h"
+#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
 struct _IP_ResolverPrivate {
 	struct QueueItem {
 		SafeNumeric<IP::ResolverStatus> status;
@@ -76,6 +77,7 @@ struct _IP_ResolverPrivate {
 	SafeFlag thread_abort;
 
 	void resolve_queues() {
+		ZoneScoped;
 		for (int i = 0; i < IP::RESOLVER_MAX_QUERIES; i++) {
 			if (queue[i].status.get() != IP::RESOLVER_STATUS_WAITING) {
 				continue;
@@ -107,6 +109,7 @@ struct _IP_ResolverPrivate {
 	}
 
 	static void _thread_function(void *self) {
+		tracy::SetThreadName("_IP_ResolverPrivate");
 		_IP_ResolverPrivate *ipr = static_cast<_IP_ResolverPrivate *>(self);
 
 		while (!ipr->thread_abort.is_set()) {
