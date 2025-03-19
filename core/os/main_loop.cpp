@@ -30,6 +30,9 @@
 
 #include "main_loop.h"
 
+#include "modules\godot_tracy\profiler.h"
+#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+
 void MainLoop::_bind_methods() {
 	BIND_CONSTANT(NOTIFICATION_OS_MEMORY_WARNING);
 	BIND_CONSTANT(NOTIFICATION_TRANSLATION_CHANGED);
@@ -67,6 +70,7 @@ bool MainLoop::process(double p_time) {
 }
 
 void MainLoop::finalize() {
+	ZoneScoped;
 	GDVIRTUAL_CALL(_finalize);
 
 	if (get_script_instance()) {
