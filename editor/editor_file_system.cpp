@@ -47,8 +47,8 @@
 #include "editor/project_settings_editor.h"
 #include "scene/resources/packed_scene.h"
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
 
 EditorFileSystem *EditorFileSystem::singleton = nullptr;
 int EditorFileSystem::nb_files_total = 0;

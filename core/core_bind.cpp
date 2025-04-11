@@ -42,8 +42,8 @@
 #include "core/os/thread_safe.h"
 #include "core/variant/typed_array.h"
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
 
 namespace core_bind {
 

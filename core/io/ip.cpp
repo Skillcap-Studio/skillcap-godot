@@ -36,8 +36,8 @@
 #include "core/variant/typed_array.h"
 
 /************* RESOLVER ******************/
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
 struct _IP_ResolverPrivate {
 	struct QueueItem {
 		SafeNumeric<IP::ResolverStatus> status;

@@ -125,8 +125,8 @@
 
 #include "modules/modules_enabled.gen.h" // For mono.
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
 
 #if defined(MODULE_MONO_ENABLED) && defined(TOOLS_ENABLED)
 #include "modules/mono/editor/bindings_generator.h"

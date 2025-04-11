@@ -45,9 +45,9 @@
 
 #include <cstring>
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
-#include "modules\godot_tracy\tracy\public\tracy\TracyC.h"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
+#include "modules/godot_tracy/tracy/public/tracy/TracyC.h"
 
 #ifdef TOOLS_ENABLED
 #define MARK_EDITED set_edited(true);

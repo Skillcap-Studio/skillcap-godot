@@ -40,8 +40,8 @@
 #include "core/os/thread.h"
 #endif
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
 
 static const char *_joy_buttons[(size_t)JoyButton::SDL_MAX] = {
 	"a",

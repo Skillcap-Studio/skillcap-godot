@@ -30,8 +30,8 @@
 
 #include "main_loop.h"
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
 
 void MainLoop::_bind_methods() {
 	BIND_CONSTANT(NOTIFICATION_OS_MEMORY_WARNING);

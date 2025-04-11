@@ -30,8 +30,8 @@
 
 #include "platform_config.h"
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
 
 #ifndef PLATFORM_THREAD_OVERRIDE // See details in thread.h.
 

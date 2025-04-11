@@ -36,8 +36,8 @@
 
 #include <stdio.h>
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
 
 #ifdef DEV_ENABLED
 // Includes safety checks to ensure that a queue set as a thread singleton override

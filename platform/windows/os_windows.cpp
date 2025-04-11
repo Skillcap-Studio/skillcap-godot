@@ -80,9 +80,9 @@
 #include "drivers/gles3/rasterizer_gles3.h"
 #endif
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
-#include "modules\godot_tracy\tracy\public\tracy\TracyC.h"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
+#include "modules/godot_tracy/tracy/public/tracy/TracyC.h"
 
 #ifdef DEBUG_ENABLED
 #pragma pack(push, before_imagehlp, 8)

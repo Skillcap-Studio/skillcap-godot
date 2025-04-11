@@ -57,9 +57,9 @@
 #endif // _3D_DISABLED
 #include "window.h"
 
-#include "modules\godot_tracy\profiler.h"
-#include "modules\godot_tracy\tracy\public\tracy\Tracy.hpp"
-#include "modules\godot_tracy\tracy\public\tracy\TracyC.h"
+#include "modules/godot_tracy/profiler.h"
+#include "modules/godot_tracy/tracy/public/tracy/Tracy.hpp"
+#include "modules/godot_tracy/tracy/public/tracy/TracyC.h"
 
 void SceneTreeTimer::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_time_left", "time"), &SceneTreeTimer::set_time_left);
