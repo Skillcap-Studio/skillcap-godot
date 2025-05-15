@@ -4403,6 +4403,7 @@ static uint64_t navigation_process_max = 0;
 // to be set explicitly here (defaults to EXIT_SUCCESS).
 bool Main::iteration() {
 	ZoneScoped;
+	FrameMarkStart("godot_frame");
 	iterating++;
 
 	const uint64_t ticks = OS::get_singleton()->get_ticks_usec();
@@ -4673,6 +4674,8 @@ bool Main::iteration() {
 		EditorNode::get_singleton()->unload_editor_addons();
 	}
 #endif
+
+	FrameMarkEnd("godot_frame");
 
 	return exit;
 }
